@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # This script demonstrates basic array slicing in Python.
 arr = [9, 8, 2, 3, 9, 4, 1, 0, 3]
 arr1 = arr[:2]
