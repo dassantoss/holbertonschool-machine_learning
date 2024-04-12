@@ -7,7 +7,7 @@ Determine the shape of a matrix as a list of its dimensions.
 def matrix_shape(matrix):
     """
     Determine the shape of a matrix as a list of its dimensions.
-    
+
     Parameters:
     - matrix: The input matrix for which the shape needs to be calculated.
 
