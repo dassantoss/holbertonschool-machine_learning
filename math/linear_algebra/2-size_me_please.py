@@ -2,6 +2,8 @@
 """
 Determine the shape of a matrix as a list of its dimensions.
 """
+
+
 def matrix_shape(matrix):
     shape = []
     while isinstance(matrix, list):
