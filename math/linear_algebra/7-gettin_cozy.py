@@ -17,6 +17,13 @@ def cat_matrices2D(mat1, mat2, axis=0):
     list of list of ints/floats: New matrix resulting from concatenatenation.
     None: If the concatenation is not posible due to dimension mismatch.
     """
+    # Handle empty matrices
+    if not mat1 and not mat2:
+        return []
+    if not mat1:
+        return mat2 if axis == 0 else None
+    if not mat2:
+        return mat1 if axis == 0 else None
     if axis == 0:
         # Check if both matrices have the same number of columns
         if all(len(row) == len(mat1[0]) for row in mat1) and \
