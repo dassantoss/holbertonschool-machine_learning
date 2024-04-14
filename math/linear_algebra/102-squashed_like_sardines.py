@@ -19,7 +19,9 @@ def cat_matrices(mat1, mat2, axis=0):
     """
 
     def recursive_concat(a, b, depth):
-        # Concatenate two sub-lists when reaching the specified axis
+        """
+        Recursively concatenates sub-lists when reaching the specified axis.
+        """
         if depth == axis:
             return a + b
         else:
@@ -27,17 +29,25 @@ def cat_matrices(mat1, mat2, axis=0):
                     for i in range(len(a))]
 
     def can_concatenate(a, b, depth):
-        # Check compatibility for concatenation at the current recursion depth
-        if isinstance(a, list) and isinstance(b, list):
-            if depth == axis:
-                return True
+        """
+        Checks if two sub-lists can be concatenated at the given depth.
+        Ensures all higher dimensions match unless at the concatenation axis.
+        """
+        if depth < axis:
+            if len(a) != len(b):
+                return False
+            return all(can_concatenate(a[i], b[i], depth + 1)
+                       for i in range(len(a)))
+        elif depth == axis:
+            return True
+        elif isinstance(a, list) and isinstance(b, list):
             if len(a) != len(b):
                 return False
             return all(can_concatenate(a[i], b[i], depth + 1)
                        for i in range(len(a)))
         return not (isinstance(a, list) or isinstance(b, list))
 
-    # Start the concatenation if possible
+    # Start the concatenation if matrices are compatible
     if can_concatenate(mat1, mat2, 0):
         return recursive_concat(mat1, mat2, 0)
     else:
