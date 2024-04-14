@@ -28,14 +28,14 @@ def cat_matrices(mat1, mat2, axis=0):
 
     def can_concatenate(a, b, depth):
         # Check compatibility for concatenation at the current recursion depth
-        if depth == axis:
-            return True
-        elif len(a) != len(b) or not (isinstance(a, list)
-                                      and isinstance(b, list)):
-            return False
-        else:
+        if isinstance(a, list) and isinstance(b, list):
+            if depth == axis:
+                return True
+            if len(a) != len(b):
+                return False
             return all(can_concatenate(a[i], b[i], depth + 1)
                        for i in range(len(a)))
+        return not (isinstance(a, list) or isinstance(b, list))
 
     # Start the concatenation if possible
     if can_concatenate(mat1, mat2, 0):
