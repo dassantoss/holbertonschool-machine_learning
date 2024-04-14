@@ -18,41 +18,24 @@ def cat_matrices(mat1, mat2, axis=0):
     - None: If the matrices cannot be concatenated along the specified axis.
     """
 
-    def recursive_concat(a, b, depth):
-        """
-        Recursively concatenates sub-lists when reaching the specified axis.
-        """
-        if depth == axis:
-            return a + b
-        elif depth < axis and isinstance(a, list) and isinstance(b, list):
-            if len(a) != len(b):
-                return None
-            return [recursive_concat(a_sub, b_sub, depth + 1)
-                    for a_sub, b_sub in zip(a, b)]
-        elif depth > axis:
-            return [recursive_concat(a, b, depth)]
-        else:
-            return None
+    def get_shape(matrix):
+        if not isinstance(matrix, list) or not matrix:
+            return []
+        shape = [len(matrix)]
+        while isinstance(matrix[0], list):
+            shape.append(len(matrix[0]))
+            matrix = matrix[0]
+        return shape
 
-    def can_concatenate(a, b, depth):
-        """
-        Checks if two sub-lists can be concatenated at the given depth.
-        Ensures all higher dimensions match unless at the concatenation axis.
-        """
-        if depth < axis:
-            if not (isinstance(a, list) and isinstance(b, list)
-                    and len(a) == len(b)):
-                return False
-            return all(can_concatenate(a_sub, b_sub, depth + 1)
-                       for a_sub, b_sub in zip(a, b))
-        return True
-
-    # Start the concatenation if matrices are compatible
-    if can_concatenate(mat1, mat2, 0):
-        result = recursive_concat(mat1, mat2, 0)
-        if isinstance(result[0], list):
-            return result
-        else:
-            return None
-    else:
+    shape1 = get_shape(mat1)
+    shape2 = get_shape(mat2)
+    if len(shape1) != len(shape2):
         return None
+    for i, (s1, s2) in enumerate(zip(shape1, shape2)):
+        if i != axis and s1 != s2:
+            return None
+
+    if axis == 0:
+        return mat1 + mat2
+    else:
+        return [cat_matrices(m1, m2, axis-1) for m1, m2 in zip(mat1, mat2)]
