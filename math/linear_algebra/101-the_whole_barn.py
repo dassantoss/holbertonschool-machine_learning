@@ -3,7 +3,6 @@
 Function that Add two matrices of the same shape.
 
 """
-import numpy as np
 
 
 def add_matrices(mat1, mat2):
@@ -18,8 +17,12 @@ def add_matrices(mat1, mat2):
     list or None: The sum of the two matrices if they are the same shape,
     or None if they are not.
     """
-    if np.shape(mat1) != np.shape(mat2):
-        return None
+    def same_shape(a, b):
+        if isinstance(a, list) and isinstance(b, list):
+            if len(a) != len(b):
+                return False
+            return all(same_shape(x, y) for x, y in zip(a, b))
+        return not (isinstance(a, list) or isinstance(b, list))
 
     def recursive_add(a, b):
         if isinstance(a, list) and isinstance(b, list):
@@ -27,4 +30,8 @@ def add_matrices(mat1, mat2):
         else:
             return a + b
 
-    return recursive_add(mat1, mat2)
+    # Only add matrices if they have the same shape
+    if same_shape(mat1, mat2):
+        return recursive_add(mat1, mat2)
+    else:
+        return None
