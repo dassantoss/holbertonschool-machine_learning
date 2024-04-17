@@ -31,8 +31,10 @@ def frequency():
     plt.figure(figsize=(6.4, 4.8))
 
     # Plot the histogram
-    plt.hist(student_grades, bins=range(0, 101, 10), edgecolor='black',
-             linewidth=1.2)
+    plt.hist(student_grades, bins=range(0, 101, 10), edgecolor='black')
+    plt.xticks(range(0, 101, 10))
+    plt.xlim(0, 100)
+    plt.ylim(0, 30)
 
     # Set the title and labels
     plt.xlabel('Grades')
