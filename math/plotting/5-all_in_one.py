@@ -48,7 +48,7 @@ def all_in_one():
     student_grades = np.random.normal(68, 15, 50)
 
     # Start plotting the subplots
-    plt.figure(figsize=(9, 6))
+    plt.figure(figsize=(6.4, 4.8))
 
     # Plot 1: Simple cubic line plot
     plt.subplot(321)
@@ -57,7 +57,7 @@ def all_in_one():
 
     # Plot 2: Scatter plot for men's height vs weight
     plt.subplot(322)
-    plt.scatter(x1, y1, color="magenta")
+    plt.scatter(x1, y1, color="m", s=10)
     plt.xlabel("Height (in)", fontsize="x-small")
     plt.ylabel("Weight (lbs)", fontsize="x-small")
     plt.title("Men's Height vs Weight", fontsize="x-small")
@@ -96,7 +96,7 @@ def all_in_one():
     plt.tight_layout()
 
     # Set the overall title for the figure
-    plt.suptitle("All in One", fontsize='x-small', verticalalignment='top')
+    plt.suptitle("All in One", verticalalignment='top')
 
     # Display the figure with all subplots
     plt.show()
