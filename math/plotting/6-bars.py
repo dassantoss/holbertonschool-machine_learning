@@ -27,7 +27,7 @@ def bars():
 
     # Define colors and labels corresponding to fruit types
     colors = ['red', 'yellow', '#ff8000', '#ffe5b4']
-    labels = ['Apples', 'Bananas', 'Oranges', 'Peaches']
+    labels = ['apples', 'bananas', 'oranges', 'peaches']
 
     # Initialize the bottom position for the stacked bars
     bar_bottom = np.zeros(3)  # Starts with zero for the first fruit type
