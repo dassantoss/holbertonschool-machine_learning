@@ -16,3 +16,4 @@ ENV/
 Thumbs.db
 math/plotting/data.npy
 math/plotting/labels.npy
+math/plotting/pca.npz
