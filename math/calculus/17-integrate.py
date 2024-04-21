@@ -20,18 +20,15 @@ def poly_integral(poly, C=0):
     """
     # Check if input is valid
     if not isinstance(poly, list) \
-        or not all(isinstance(c, int)
-                   for c in poly) or not isinstance(C, int):
+        or not isinstance(C, int) or not all(isinstance(coef, int)
+                                             for coef in poly):
         return None
 
-    if len(poly) == 0 or all(c == 0 for c in poly):
-        return [C]
+    # The new list of coefficients after integration
+    integral = [C] + [coef / (i + 1) for i, coef in enumerate(poly)]
 
-    # Integrate each term and create a new list of coefficients
-    integral = [C] + [coeff / (i + 1) for i, coeff in enumerate(poly)]
-
-    # Convert floating point numbers to integers if they are whole numbers
-    integral = [int(c) if isinstance(c, float) and c.is_integer()
-                else c for c in integral]
+    # Round down if the coefficient is a whole number
+    integral = [int(coef) if coef == int(coef) else coef
+                for coef in integral]
 
     return integral
