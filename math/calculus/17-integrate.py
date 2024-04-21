@@ -19,22 +19,12 @@ def poly_integral(poly, C=0):
     polynomial.
     """
     # Check if the inputs are of valid types
-    if not isinstance(poly, list) or not all(isinstance(x, int)
-                                             for x in poly):
-        return None
-    if not isinstance(C, int):
-        return None
-
-    # The integral calculation
-    integral = [C]
-    for i in range(len(poly)):
-        # Integral of x^n is x^(n+1)/(n+1)
-        if poly[i] != 0:
-            integral.append(poly[i] / (i + 1))
-
-    # Convert float to int where possible
-    for i in range(len(integral)):
-        if integral[i] == int(integral[i]):
-            integral[i] = int(integral[i])
-      
-    return integral
+    if isinstance(poly, list) \
+        and all(isinstance(x, (int, float))
+                for x in poly) and isinstance(C, (int, float)):
+        if not poly:
+            return [C]
+        integral = [C] + [poly[i] / (i + 1) for i in range(len(poly))]
+        return [int(x) if isinstance(x, float) and x.is_integer()
+                else x for x in integral]
+    return None
