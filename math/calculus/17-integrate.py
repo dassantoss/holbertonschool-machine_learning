@@ -18,17 +18,23 @@ def poly_integral(poly, C=0):
     list: A new list of coefficients representing the integral of the
     polynomial.
     """
-    # Check if input is valid
-    if not isinstance(poly, list) \
-        or not isinstance(C, int) or not all(isinstance(coef, int)
-                                             for coef in poly):
+    # Check if the inputs are of valid types
+    if not isinstance(poly, list) or not all(isinstance(x, int)
+                                             for x in poly):
+        return None
+    if not isinstance(C, int):
         return None
 
-    # The new list of coefficients after integration
-    integral = [C] + [coef / (i + 1) for i, coef in enumerate(poly)]
+    # The integral calculation
+    integral = [C]
+    for i in range(len(poly)):
+        # Integral of x^n is x^(n+1)/(n+1)
+        if poly[i] != 0:
+            integral.append(poly[i] / (i + 1))
 
-    # Round down if the coefficient is a whole number
-    integral = [int(coef) if coef == int(coef) else coef
-                for coef in integral]
-
+    # Convert float to int where possible
+    for i in range(len(integral)):
+        if integral[i] == int(integral[i]):
+            integral[i] = int(integral[i])
+      
     return integral
