@@ -18,19 +18,21 @@ def poly_integral(poly, C=0):
     list: A new list of coefficients representing the integral of the
     polynomial.
     """
-    if not isinstance(poly, list) \
-        or not all(isinstance(c, int)
-                   for c in poly) or not isinstance(C, int):
+    if type(poly) is not list or len(poly) == 0:
         return None
-
-    if len(poly) == 0 or all(c == 0 for c in poly):
-        return [C]
-
-    # Integrate each term and create a new list of coefficients
-    integral = [C] + [coeff / (i + 1) for i, coeff in enumerate(poly)]
-
-    # Convert floating point numbers to integers if they are whole numbers
-    integral = [int(c) if isinstance(c, float) and c.is_integer()
-                else c for c in integral]
-
-    return integral
+    elif type(C) is int:
+        if poly == [0]:
+            return [C]
+        exponent = 0
+        integral = poly.copy()
+        for i in range(len(integral)):
+            if type(integral[i]) is int or type(integral[i]) is float:
+                exponent += 1
+                number = integral[i] / exponent
+                integral[i] = int(number) if number % 1 == 0 else number
+            else:
+                return None
+        integral.insert(0, C)
+        return integral
+    else:
+        return None
