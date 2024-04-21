@@ -16,8 +16,9 @@ def poly_derivative(poly):
     None: Input is invalid.
     [0]: Polynomial is constant.
     """
-    # Check if poly is a list of integers
-    if not isinstance(poly, list) or not all(isinstance(c, int) for c in poly):
+    # Check if poly is a list of integers and not empty
+    if not isinstance(poly, list) or not poly or not all(isinstance(c, int)
+                                                         for c in poly):
         return None
     # Handle the case for constant polynomial
     if len(poly) == 1:
