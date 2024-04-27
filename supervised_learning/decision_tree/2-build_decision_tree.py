@@ -73,9 +73,9 @@ class Node:
         """
         lines = text.split("\n")
         new_text = "    +--" + lines[0] + "\n"
-        for line in lines[1:-1]:
-            new_text += "     " + line + "\n"  # Add extra space for alignment
-        return new_text
+        for x in lines[1:]:
+            new_text += ("       " + x) + "\n"
+        return (new_text.rstrip())
 
     def max_depth_below(self):
         """
