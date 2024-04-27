@@ -45,8 +45,6 @@ class Node:
 
         return node_line.strip()
 
-        return result.strip()
-
     def left_child_add_prefix(self, text):
         """
         Adds a prefix for the left child's subtree representation.
