@@ -37,7 +37,8 @@ class Node:
             str: A string representation of the subtree rooted at this node.
         """
         p = "root" if self.is_root else "-> node"
-        result = f"{p} [feature={self.feature},threshold={self.threshold}]\n"
+        result = f"{p} [feature={self.feature},\
+ threshold={self.threshold}]\n"
         if self.left_child:
             result +=\
                 self.left_child_add_prefix(self.left_child.__str__().strip())
