@@ -36,7 +36,7 @@ class Node:
         Returns:
             str: A string representation of the subtree rooted at this node.
         """
-        prefix = "root" if self.is_root else "-> node"
+        prefix = "root " if self.is_root else "-> node "
         result = f"{prefix}[feature={self.feature}, threshold={self.threshold}]\n" \
             + self.left_child_add_prefix(str(self.left_child))\
             + self.right_child_add_prefix(str(self.right_child))
@@ -134,7 +134,7 @@ class Leaf(Node):
         Returns:
             str: A string representation of this leaf.
         """
-        return f"leaf [value={self.value}]"
+        return (f"-> leaf [value={self.value}] ")
 
     def max_depth_below(self):
         """
