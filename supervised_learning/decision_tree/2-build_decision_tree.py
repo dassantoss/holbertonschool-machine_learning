@@ -36,14 +36,12 @@ class Node:
         Returns:
             str: A string representation of the subtree rooted at this node.
         """
-        prefix = "root " if self.is_root else "node "
-        node_line = f"{prefix}[feature={self.feature}, threshold={self.threshold}]\n"
-        if self.left_child:
-            node_line += "    +---> " + "\n    |    ".join(str(self.left_child).split("\n")) + "\n"
-        if self.right_child:
-            node_line += "    +---> " + "\n         ".join(str(self.right_child).split("\n")).rstrip()
+        prefix = "root" if self.is_root else "-> node"
+        result = f"{prefix}[feature={self.feature}, threshold={self.threshold}]\n" \
+            + self.left_child_add_prefix(str(self.left_child))\
+            + self.right_child_add_prefix(str(self.right_child))
 
-        return node_line.strip()
+        return result.strip()
 
     def left_child_add_prefix(self, text):
         """
