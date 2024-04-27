@@ -37,12 +37,11 @@ class Node:
             str: A string representation of the subtree rooted at this node.
         """
         prefix = "root " if self.is_root else "-> node "
-        result = f"{prefix}[feature={self.feature}, threshold={self.threshold}]\n"
-        
-        if self.left_child:
-            result += self.left_child_add_prefix(self.left_child.__str__())
-        if self.right_child:
-            result += self.right_child_add_prefix(self.right_child.__str__())
+        result = f"{prefix}[[feature={self.feature},\
+            threshold={self.threshold}]\n" \
+            + self.left_child_add_prefix(str(self.left_child)) \
+            + self.right_child_add_prefix(str(self.right_child))
+
         return result
 
     def left_child_add_prefix(self, text):
@@ -55,10 +54,10 @@ class Node:
         Returns:
             str: The modified subtree string with added prefixes.
         """
-        lines=text.split("\n")
-        new_text="    +--"+lines[0]+"\n"
-        for x in lines[1:] :
-            new_text+=("    |  "+x)+"\n"
+        lines = text.split("\n")
+        new_text = "    +--" + lines[0] + "\n"
+        for x in lines[1:]:
+            new_text += ("    |  " + x) + "\n"
         return (new_text)
 
     def right_child_add_prefix(self, text):
@@ -74,7 +73,7 @@ class Node:
         lines = text.split("\n")
         new_text = "    +--" + lines[0] + "\n"
         for x in lines[1:]:
-            new_text += ("      " + x) + "\n"
+            new_text += ("       " + x) + "\n"
         return (new_text.rstrip())
 
     def max_depth_below(self):
