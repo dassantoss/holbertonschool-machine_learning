@@ -26,8 +26,7 @@ class Isolation_Random_Forest():
         numpy_preds (list): List of prediction functions from each tree in
         the forest.
     """
-    def __init__(self, n_trees=100, max_depth=10, min_pop=1, seed=0,
-                 verbose=0):
+    def __init__(self, n_trees=100, max_depth=10, min_pop=1, seed=0):
         """
         Initializes the Isolation Random Forest with specified parameters.
 
@@ -45,7 +44,6 @@ class Isolation_Random_Forest():
         self.n_trees = n_trees
         self.max_depth = max_depth
         self.seed = seed
-        self.verbose = verbose
 
     def predict(self, explanatory):
         """
@@ -79,7 +77,6 @@ class Isolation_Random_Forest():
         Returns:
             None
         """
-        self.verbose = verbose
         self.explanatory = explanatory
         self.numpy_preds = []
         depths = []
@@ -93,7 +90,7 @@ class Isolation_Random_Forest():
             depths.append(T.depth())
             nodes.append(T.count_nodes())
             leaves.append(T.count_nodes(only_leaves=True))
-        if self.verbose:
+        if verbose == 1:
             print(f"""  Training finished.
     - Mean depth                     : { np.array(depths).mean()      }
     - Mean number of nodes           : { np.array(nodes).mean()       }
@@ -117,9 +114,5 @@ class Isolation_Random_Forest():
         """
         depths = self.predict(explanatory)
         sorted_indices = np.argsort(depths)
-        suspect_data = explanatory[sorted_indices[:n_suspects]]
-        suspect_depths = depths[sorted_indices[:n_suspects]]
-        if self.verbose:
-            print("Suspects Selected Data:", suspect_data)
-            print("Suspects Depths:", suspect_depths)
-        return suspect_data, suspect_depths
+        return explanatory[sorted_indices[:n_suspects]], \
+            depths[sorted_indices[:n_suspects]]
