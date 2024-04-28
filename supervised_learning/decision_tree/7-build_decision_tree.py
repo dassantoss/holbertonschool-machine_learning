@@ -419,12 +419,13 @@ class Decision_Tree():
 
         if verbose == 1:
             # print("----------------------------------------------------")
-            print(f"""  Training finished.
-    - Depth                     : { self.depth()       }
-    - Number of nodes           : { self.count_nodes() }
-    - Number of leaves          : { self.count_nodes(only_leaves=True) }
-    - Accuracy on training data : { self.accuracy(self.explanatory,
-                                              self.target)}""")
+            print(f"  Training finished.")
+            print(f"    - Depth                     : {self.depth()}")
+            print(f"    - Number of nodes           : {self.count_nodes()}")
+            print(f"    - Number of leaves          : "
+                  f"{self.count_nodes(only_leaves=True)}")
+            print(f"    - Accuracy on training data : "
+                  f"{self.accuracy(self.explanatory, self.target)}")
             # print("----------------------------------------------------")
 
     def np_extrema(self, arr):
@@ -479,27 +480,27 @@ class Decision_Tree():
         right_population = node.sub_population & ~left_population
 
         # Is left node a leaf ?
-        unique_classes, counts = np.unique(
-            self.target[left_population], return_counts=True)
-        is_left_leaf = (len(counts) == 1 or node.depth >= self.max_depth or
-                        len(self.target[left_population]) < self.min_pop)
+        is_left_leaf = (node.depth == self.max_depth - 1 or
+                        np.sum(left_population) <= self.min_pop or
+                        np.unique(self.target[left_population]).size == 1)
 
         if is_left_leaf:
             node.left_child = self.get_leaf_child(node, left_population)
         else:
             node.left_child = self.get_node_child(node, left_population)
+            node.left_child.depth = node.depth + 1
             self.fit_node(node.left_child)
 
         # Is right node a leaf ?
-        unique_classes, counts = np.unique(
-            self.target[right_population], return_counts=True)
-        is_right_leaf = (len(counts) == 1 or node.depth >= self.max_depth or
-                         len(self.target[right_population]) < self.min_pop)
+        is_right_leaf = (node.depth == self.max_depth - 1 or
+                         np.sum(right_population) <= self.min_pop or
+                         np.unique(self.target[right_population]).size == 1)
 
         if is_right_leaf:
             node.right_child = self.get_leaf_child(node, right_population)
         else:
             node.right_child = self.get_node_child(node, right_population)
+            node.right_child.depth = node.depth + 1
             self.fit_node(node.right_child)
 
     def get_leaf_child(self, node, sub_population):
