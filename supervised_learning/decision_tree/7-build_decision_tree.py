@@ -419,13 +419,12 @@ class Decision_Tree():
 
         if verbose == 1:
             # print("----------------------------------------------------")
-            print(f"  Training finished.")
-            print(f"    - Depth                     : {self.depth()}")
-            print(f"    - Number of nodes           : {self.count_nodes()}")
-            print(f"    - Number of leaves          : "
-                  f"{self.count_nodes(only_leaves=True)}")
-            print(f"    - Accuracy on training data : "
-                  f"{self.accuracy(self.explanatory, self.target)}")
+            print(f"""  Training finished.
+    - Depth                     : { self.depth()       }
+    - Number of nodes           : { self.count_nodes() }
+    - Number of leaves          : { self.count_nodes(only_leaves=True) }
+    - Accuracy on training data : { self.accuracy(self.explanatory,
+                                              self.target)}""")
             # print("----------------------------------------------------")
 
     def np_extrema(self, arr):
