@@ -177,11 +177,12 @@ class Node:
 
     def update_predict(self):
         """
-        Updates the prediction function of the decision tree. This function 
-        prepares the tree to make predictions by updating bounds, retrieving 
-        all leaves, and setting their indicators. It defines a lambda function 
-        as the predict method, which uses these indicators to determine which 
-        leaf's value to return for each input sample.
+        Updates the prediction function of the decision tree.
+        This function prepares the tree to make predictions by updating
+        bounds, retrieving all leaves, and setting their indicators.
+        It defines a lambda function as the predict method, which uses
+        these indicators to determine which leaf's value to return for
+        each input sample.
         """
         self.update_bounds()
         leaves = self.get_leaves()
