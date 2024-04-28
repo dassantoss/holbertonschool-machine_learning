@@ -26,7 +26,8 @@ class Isolation_Random_Forest():
         numpy_preds (list): List of prediction functions from each tree in
         the forest.
     """
-    def __init__(self, n_trees=100, max_depth=10, min_pop=1, seed=0):
+    def __init__(self, n_trees=100, max_depth=10, min_pop=1, seed=0,
+                 verbose=0):
         """
         Initializes the Isolation Random Forest with specified parameters.
 
@@ -44,6 +45,7 @@ class Isolation_Random_Forest():
         self.n_trees = n_trees
         self.max_depth = max_depth
         self.seed = seed
+        self.verbose = verbose
 
     def predict(self, explanatory):
         """
@@ -58,7 +60,10 @@ class Isolation_Random_Forest():
             in the forest.
         """
         predictions = np.array([f(explanatory) for f in self.numpy_preds])
-        return predictions.mean(axis=0)
+        mean_predictions = predictions.mean(axis=0)
+        if self.verbose:
+            print("Predictions Mean per Sample:", mean_predictions)
+        return mean_predictions
 
     def fit(self, explanatory, n_trees=100, verbose=0):
         """
@@ -74,6 +79,7 @@ class Isolation_Random_Forest():
         Returns:
             None
         """
+        self.verbose = verbose
         self.explanatory = explanatory
         self.numpy_preds = []
         depths = []
@@ -87,7 +93,7 @@ class Isolation_Random_Forest():
             depths.append(T.depth())
             nodes.append(T.count_nodes())
             leaves.append(T.count_nodes(only_leaves=True))
-        if verbose == 1:
+        if self.verbose:
             print(f"""  Training finished.
     - Mean depth                     : { np.array(depths).mean()      }
     - Mean number of nodes           : { np.array(nodes).mean()       }
@@ -109,11 +115,11 @@ class Isolation_Random_Forest():
                 the second contains the corresponding depths indicating
                 their isolation levels.
         """
-        # Calculate the mean depth for each data point using predict method
         depths = self.predict(explanatory)
-        # Get the indices that would sort the depths array in ascending order
         sorted_indices = np.argsort(depths)
-        # Select the top n suspects with the smallest depths
         suspect_data = explanatory[sorted_indices[:n_suspects]]
         suspect_depths = depths[sorted_indices[:n_suspects]]
+        if self.verbose:
+            print("Suspects Selected Data:", suspect_data)
+            print("Suspects Depths:", suspect_depths)
         return suspect_data, suspect_depths
