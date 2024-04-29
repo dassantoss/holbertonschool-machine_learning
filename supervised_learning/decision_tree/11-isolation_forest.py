@@ -80,8 +80,8 @@ class Isolation_Random_Forest():
         nodes = []
         leaves = []
         for i in range(n_trees):
-            T = Isolation_Random_Tree(
-                max_depth=self.max_depth, seed=self.seed+i)
+            T = Isolation_Random_Tree(max_depth=self.max_depth,
+                                      seed=self.seed + i)
             T.fit(explanatory)
             self.numpy_preds.append(T.predict)
             depths.append(T.depth())
@@ -109,7 +109,11 @@ class Isolation_Random_Forest():
                 the second contains the corresponding depths indicating
                 their isolation levels.
         """
+        # Calculate the mean depth for each data point using predict method
         depths = self.predict(explanatory)
+        # Get the indices that would sort the depths array in ascending order
         sorted_indices = np.argsort(depths)
-        return explanatory[sorted_indices[:n_suspects]], \
-            depths[sorted_indices[:n_suspects]]
+        # Select the top n suspects with the smallest depths
+        suspect_data = explanatory[sorted_indices[:n_suspects]]
+        suspect_depths = depths[sorted_indices[:n_suspects]]
+        return suspect_data, suspect_depths
