@@ -100,11 +100,8 @@ class Isolation_Random_Tree():
         leaves = self.get_leaves()
         for leaf in leaves:
             leaf.update_indicator()
-        self.predict = lambda A: np.array([
-            next(leaf.value for leaf in leaves
-                 if leaf.indicator(x.reshape(1, -1)))
-            for x in np.atleast_2d(A)
-        ])
+
+        self.predict = lambda A: np.array([self.root.pred(x) for x in A])
 
     def np_extrema(self, arr):
         """
