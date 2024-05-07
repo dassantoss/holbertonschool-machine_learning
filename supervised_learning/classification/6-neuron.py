@@ -15,6 +15,7 @@ class Neuron:
     Implements a single neuron for binary classification.
 
     Attributes:
+        nx (int): The number of input features for the neuron.
         __W (numpy.ndarray): The weights of the neuron.
         __b (float): The bias of the neuron.
         __A (float): The activated output of the neuron.
@@ -39,6 +40,36 @@ class Neuron:
         self.__W = np.random.randn(1, nx)
         self.__b = 0
         self.__A = 0
+
+    @property
+    def W(self):
+        """
+        Getter method for the weights of the neuron.
+
+        Returns:
+            numpy.ndarray: The weights of the neuron.
+        """
+        return self.__W
+
+    @property
+    def b(self):
+        """
+        Getter method for the bias of the neuron.
+
+        Returns:
+            float: The bias of the neuron.
+        """
+        return self.__b
+
+    @property
+    def A(self):
+        """
+        Getter method for the activated output of the neuron.
+
+        Returns:
+            float: The activated output of the neuron.
+        """
+        return self.__A
 
     def forward_prop(self, X):
         """
@@ -136,35 +167,4 @@ class Neuron:
             A = self.forward_prop(X)
             self.gradient_descent(X, Y, A, alpha)
 
-        cost = self.cost(Y, A)
-        return A, cost
-
-    @property
-    def W(self):
-        """
-        Getter method for the weights of the neuron.
-
-        Returns:
-            numpy.ndarray: The weights of the neuron.
-        """
-        return self.__W
-
-    @property
-    def b(self):
-        """
-        Getter method for the bias of the neuron.
-
-        Returns:
-            float: The bias of the neuron.
-        """
-        return self.__b
-
-    @property
-    def A(self):
-        """
-        Getter method for the activated output of the neuron.
-
-        Returns:
-            float: The activated output of the neuron.
-        """
-        return self.__A
+        return self.evaluate(X, Y)
