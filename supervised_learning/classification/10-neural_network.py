@@ -92,7 +92,7 @@ class NeuralNetwork:
             and output layer respectively.
         """
         z1 = np.dot(self.__W1, X) + self.__b1
-        self.__A1 = 1 / (1 + np.exp(-z1))  # Sigmoid for hidden layer.
+        self.__A1 = 1 / (1 + np.exp(-z1))  # Sigmoid hidden layer.
         z2 = np.dot(self.__W2, self.__A1) + self.__b2
-        self.__A2 = 1 / (1 + np.exp(-z2))  # Sigmoid for output layer.
+        self.__A2 = 1 / (1 + np.exp(-z2))  # Sigmoid output layer.
         return self.__A1, self.__A2
