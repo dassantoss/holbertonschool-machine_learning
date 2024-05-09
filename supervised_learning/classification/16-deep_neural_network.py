@@ -50,7 +50,7 @@ class DeepNeuralNetwork:
             layer_size = layers[i - 1]
             prev_layer_size = nx if i == 1 else layers[i - 2]
 
-            # He initialization for weights
+            # He initialization weights
             self.weights[f'W{i}'] = \
                 np.random.randn(layer_size, prev_layer_size) \
                 * np.sqrt(2 / prev_layer_size)
