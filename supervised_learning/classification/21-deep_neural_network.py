@@ -147,20 +147,20 @@ class DeepNeuralNetwork:
             biases, adjusted by gradient descent.
         """
         m = Y.shape[1]
-        dZ = cache[f"A{self.__L}"] - Y  # Difference at the output
+        dZ = cache[f"A{self.__L}"] - Y  # Difference at the output layer
 
         for i in reversed(range(1, self.__L + 1)):
-            A_prev = cache[f'A{i-1}']
+            A_prev = cache[f'A{i-1}'] if i > 1 else cache['A0']
 
             # Compute gradients
             dW = np.dot(dZ, A_prev.T) / m
             db = np.sum(dZ, axis=1, keepdims=True) / m
 
-            # Update weights and biases
-            self.__weights[f'W{i}'] -= alpha * dW
-            self.__weights[f'b{i}'] -= alpha * db
-
             if i > 1:
-                # Calculate dZ next layer
                 W_current = self.__weights[f'W{i}']
-                dZ = np.dot(W_current.T, dZ) * (A_prev * (1 - A_prev)) 
+                # Prepare the next layer's gradient calculation
+                dZ = np.dot(W_current.T, dZ) * (A_prev * (1 - A_prev))
+
+            # Update weights and biases after preparing dZ
+            self.__weights[f'W{i}'] -= alpha * dW
+            self.__weights[f"b{i}"] -= alpha * db
