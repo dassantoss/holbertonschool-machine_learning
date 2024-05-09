@@ -147,7 +147,8 @@ class DeepNeuralNetwork:
             biases, adjusted by gradient descent.
         """
         m = Y.shape[1]
-        dZ = cache[f"A{self.__L}"] - Y
+        dZ = cache[f"A{self.__L}"] - Y  # Difference at the output
+
         for i in reversed(range(1, self.__L + 1)):
             A_prev = cache[f'A{i-1}']
 
@@ -162,4 +163,4 @@ class DeepNeuralNetwork:
             if i > 1:
                 # Calculate dZ next layer
                 W_current = self.__weights[f'W{i}']
-                dZ = np.dot(W_current.T, dZ) * (A_prev * (1 - A_prev))
+                dZ = np.dot(W_current.T, dZ) * (A_prev * (1 - A_prev)) 
