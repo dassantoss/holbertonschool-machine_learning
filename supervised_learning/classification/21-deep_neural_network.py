@@ -160,6 +160,6 @@ class DeepNeuralNetwork:
             self.__weights[f'b{i}'] -= alpha * db
 
             if i > 1:
-                # Calculate dZ for the next layer
+                # Calculate dZ next layer
                 W_current = self.__weights[f'W{i}']
                 dZ = np.dot(W_current.T, dZ) * (A_prev * (1 - A_prev))
