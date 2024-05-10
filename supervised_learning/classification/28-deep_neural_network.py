@@ -103,14 +103,13 @@ class DeepNeuralNetwork:
         A = X
         for i in range(1, self.__L + 1):
             prev_A = self.__cache[f"A{i - 1}"]
-            Z = np.matmul(self.__weights[f"W{i}"], prev_A)\
-                + self.__weights[f"b{i}"]
-            if i < self.__L:
+            Z = np.matmul(self.__weights[f"W{i}"], prev_A) + self.__weights[f"b{i}"]
+            if i < self.__L:  # Aplicación de tanh o sig
                 if self.__activation == 'sig':
                     A = 1 / (1 + np.exp(-Z))
-                else:
+                else:  # tanh
                     A = np.tanh(Z)
-            else:
+            else:  # Softmax en la última capa
                 exp_Z = np.exp(Z - np.max(Z, axis=0, keepdims=True))
                 A = exp_Z / np.sum(exp_Z, axis=0, keepdims=True)
             self.__cache[f"A{i}"] = A
