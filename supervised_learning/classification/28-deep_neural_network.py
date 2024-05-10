@@ -179,10 +179,12 @@ class DeepNeuralNetwork:
             dW = np.dot(dZ, A_prev.T) / m
             db = np.sum(dZ, axis=1, keepdims=True) / m
 
-            if i > 1:
-                W_current = self.__weights[f'W{i}']
-                # Prepare the next layer's gradient calculation
+        if i > 1:
+            W_current = self.__weights[f'W{i}']
+            if self.__activation == 'sig':
                 dZ = np.dot(W_current.T, dZ) * (A_prev * (1 - A_prev))
+            else:  # tanh
+                dZ = np.dot(W_current.T, dZ) * (1 - np.tanh(A_prev)**2)
 
             # Update weights and biases after preparing dZ
             self.__weights[f'W{i}'] -= alpha * dW
