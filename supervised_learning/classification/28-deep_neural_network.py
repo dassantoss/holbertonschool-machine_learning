@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
+""""""
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class DeepNeuralNetwork:
+    """"""
     def __init__(self, nx, layers, activation='sig'):
         if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
@@ -24,7 +27,9 @@ class DeepNeuralNetwork:
                 prev_layer = nx
             else:
                 prev_layer = layers[i - 1]
-            self.__weights[f"W{i + 1}"] = np.random.randn(layers[i], prev_layer) * np.sqrt(2 / prev_layer)
+            self.__weights[f"W{i + 1}"] = \
+                np.random.randn(layers[i], prev_layer) * \
+                np.sqrt(2 / prev_layer)
             self.__weights[f"b{i + 1}"] = np.zeros((layers[i], 1))
 
     @property
@@ -44,10 +49,12 @@ class DeepNeuralNetwork:
         return self.__activation
 
     def forward_prop(self, X):
+        """"""
         self.__cache["A0"] = X
         for i in range(1, self.__L + 1):
             prev_A = self.__cache[f"A{i - 1}"]
-            Z = np.matmul(self.__weights[f"W{i}"], prev_A) + self.__weights[f"b{i}"]
+            Z = np.matmul(self.__weights[f"W{i}"], prev_A) + \
+                self.__weights[f"b{i}"]
             if i < self.__L:
                 if self.__activation == 'sig':
                     A = 1 / (1 + np.exp(-Z))
@@ -60,16 +67,19 @@ class DeepNeuralNetwork:
         return self.__cache[f"A{self.__L}"], self.__cache
 
     def cost(self, Y, A):
+        """"""
         m = Y.shape[1]
         return -(1 / m) * np.sum(Y * np.log(A))
 
     def evaluate(self, X, Y):
+        """"""
         output, cache = self.forward_prop(X)
         prediction = np.eye(output.shape[0])[np.argmax(output, axis=0)].T
         cost = self.cost(Y, output)
         return prediction, cost
 
     def gradient_descent(self, Y, cache, alpha=0.05):
+        """"""
         m = Y.shape[1]
         dZ = cache[f"A{self.__L}"] - Y
         for i in range(self.__L, 0, -1):
@@ -77,13 +87,17 @@ class DeepNeuralNetwork:
             dW = (1 / m) * np.matmul(dZ, prev_A.T)
             db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
             if self.__activation == 'sig':
-                dZ = np.matmul(self.__weights[f"W{i}"].T, dZ) * prev_A * (1 - prev_A)
+                dZ = np.matmul(self.__weights[f"W{i}"].T, dZ) * prev_A * \
+                    (1 - prev_A)
             else:
-                dZ = np.matmul(self.__weights[f"W{i}"].T, dZ) * (1 - (prev_A ** 2))
+                dZ = np.matmul(self.__weights[f"W{i}"].T, dZ) * \
+                    (1 - (prev_A ** 2))
             self.__weights[f"W{i}"] -= alpha * dW
             self.__weights[f"b{i}"] -= alpha * db
 
-    def train(self, X, Y, iterations=5000, alpha=0.05, verbose=True, graph=True, step=100):
+    def train(self, X, Y, iterations=5000, alpha=0.05,
+              verbose=True, graph=True, step=100):
+        """"""
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
         if iterations <= 0:
@@ -121,6 +135,7 @@ class DeepNeuralNetwork:
         return self.evaluate(X, Y)
 
     def save(self, filename):
+        """"""
         if not filename.endswith(".pkl"):
             filename += ".pkl"
         with open(filename, "wb") as file:
@@ -128,6 +143,7 @@ class DeepNeuralNetwork:
 
     @staticmethod
     def load(filename):
+        """"""
         try:
             with open(filename, "rb") as file:
                 unpickled_obj = pickle.load(file)
