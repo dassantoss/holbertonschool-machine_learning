@@ -19,3 +19,5 @@ math/plotting/labels.npy
 math/plotting/pca.npz
 supervised_learning/classification/27-output.pkl
 supervised_learning/classification/27-saved.pkl
+supervised_learning/classification/28-saved.pkl
+supervised_learning/classification/28-output.pkl
