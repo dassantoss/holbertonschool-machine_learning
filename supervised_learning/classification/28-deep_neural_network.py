@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-""""""
+"""Deep Neural Network module for classification tasks."""
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
 
 class DeepNeuralNetwork:
-    """"""
+    """Deep Neural Network class for handling layers and backpropagation."""
+
     def __init__(self, nx, layers, activation='sig'):
+        """Initialize the neural network."""
         if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
         if nx < 1:
@@ -34,22 +36,26 @@ class DeepNeuralNetwork:
 
     @property
     def L(self):
+        """Number of layers in the neural network."""
         return self.__L
 
     @property
     def cache(self):
+        """Cached values for each layer during forward propagation."""
         return self.__cache
 
     @property
     def weights(self):
+        """Weights and biases of the neural network."""
         return self.__weights
 
     @property
     def activation(self):
+        """Activation function used in the neural layers."""
         return self.__activation
 
     def forward_prop(self, X):
-        """"""
+        """Perform forward propagation through the network."""
         self.__cache["A0"] = X
         for i in range(1, self.__L + 1):
             prev_A = self.__cache[f"A{i - 1}"]
@@ -67,19 +73,19 @@ class DeepNeuralNetwork:
         return self.__cache[f"A{self.__L}"], self.__cache
 
     def cost(self, Y, A):
-        """"""
+        """Calculate the cost using logistic regression."""
         m = Y.shape[1]
         return -(1 / m) * np.sum(Y * np.log(A))
 
     def evaluate(self, X, Y):
-        """"""
+        """Evaluate the neural network's predictions and cost."""
         output, cache = self.forward_prop(X)
         prediction = np.eye(output.shape[0])[np.argmax(output, axis=0)].T
         cost = self.cost(Y, output)
         return prediction, cost
 
     def gradient_descent(self, Y, cache, alpha=0.05):
-        """"""
+        """Perform one iteration of gradient descent on the neural network."""
         m = Y.shape[1]
         dZ = cache[f"A{self.__L}"] - Y
         for i in range(self.__L, 0, -1):
@@ -97,7 +103,7 @@ class DeepNeuralNetwork:
 
     def train(self, X, Y, iterations=5000, alpha=0.05,
               verbose=True, graph=True, step=100):
-        """"""
+        """Train the neural network and plot the cost."""
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
         if iterations <= 0:
@@ -135,7 +141,7 @@ class DeepNeuralNetwork:
         return self.evaluate(X, Y)
 
     def save(self, filename):
-        """"""
+        """Save the model to a file."""
         if not filename.endswith(".pkl"):
             filename += ".pkl"
         with open(filename, "wb") as file:
@@ -143,7 +149,7 @@ class DeepNeuralNetwork:
 
     @staticmethod
     def load(filename):
-        """"""
+        """Load a saved model from a file."""
         try:
             with open(filename, "rb") as file:
                 unpickled_obj = pickle.load(file)
