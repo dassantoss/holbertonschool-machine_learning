@@ -63,7 +63,7 @@ class DeepNeuralNetwork:
             self.__weights[f'W{i}'] = \
                 np.random.randn(layer_size, prev_layer_size) \
                 * np.sqrt(2 / prev_layer_size)
-            self.__weights[f'W{i}'] = np.random.randn(layer_size, prev_layer_size) * np.sqrt(1 / prev_layer_size)
+            self.__weights[f'b{i}'] = np.zeros((layer_size, 1))
 
     @property
     def L(self):
@@ -103,18 +103,18 @@ class DeepNeuralNetwork:
         A = X
         for i in range(1, self.__L + 1):
             prev_A = self.__cache[f"A{i - 1}"]
-            Z = np.matmul(self.__weights[f"W{i}"], prev_A) + self.__weights[f"b{i}"]
+            Z = np.matmul(self.__weights[f"W{i}"], prev_A)\
+                + self.__weights[f"b{i}"]
             if i < self.__L:
                 if self.__activation == 'sig':
                     A = 1 / (1 + np.exp(-Z))
-                else:  # Aplicar tanh
+                else:
                     A = np.tanh(Z)
-            else:  # Aplicación de softmax en la última capa
-                Z -= np.max(Z, axis=0, keepdims=True)  # Estabilización numérica
-                exp_Z = np.exp(Z)
+            else:
+                exp_Z = np.exp(Z - np.max(Z, axis=0, keepdims=True))
                 A = exp_Z / np.sum(exp_Z, axis=0, keepdims=True)
             self.__cache[f"A{i}"] = A
-        return A, self.__cache
+        return self.__cache[f"A{self.__L}"], self.__cache
 
     def cost(self, Y, A):
         """
@@ -170,17 +170,21 @@ class DeepNeuralNetwork:
                 and biases, adjusted by gradient descent.
         """
         m = Y.shape[1]
-        dZ = cache[f"A{self.__L}"] - Y
+        dZ = cache[f"A{self.__L}"] - Y  # Difference at the output layer
+
         for i in reversed(range(1, self.__L + 1)):
             A_prev = cache[f'A{i-1}'] if i > 1 else cache['A0']
+
+            # Compute gradients
             dW = np.dot(dZ, A_prev.T) / m
             db = np.sum(dZ, axis=1, keepdims=True) / m
+
             if i > 1:
                 W_current = self.__weights[f'W{i}']
-                if self.__activation == 'sig':
-                    dZ = np.dot(W_current.T, dZ) * (A_prev * (1 - A_prev))
-                elif self.__activation == 'tanh':
-                    dZ = np.dot(W_current.T, dZ) * (1 - np.square(np.tanh(A_prev)))
+                # Prepare the next layer's gradient calculation
+                dZ = np.dot(W_current.T, dZ) * (A_prev * (1 - A_prev))
+
+            # Update weights and biases after preparing dZ
             self.__weights[f'W{i}'] -= alpha * dW
             self.__weights[f"b{i}"] -= alpha * db
 
