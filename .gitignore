@@ -21,3 +21,7 @@ supervised_learning/classification/27-output.pkl
 supervised_learning/classification/27-saved.pkl
 supervised_learning/classification/28-saved.pkl
 supervised_learning/classification/28-output.pkl
+supervised_learning/tensorflow/model.ckpt.meta
+supervised_learning/tensorflow/model.ckpt.index
+supervised_learning/tensorflow/model.ckpt.data-00000-of-00001
+supervised_learning/tensorflow/checkpoint
