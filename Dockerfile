@@ -38,6 +38,9 @@ RUN pip3 install pycodestyle==2.11.1
 # Instalar scikit-learn
 RUN pip3 install -U scikit-learn
 
+# Instalar TensorFlow, puede especificar la versión o dejar la más reciente
+RUN pip3 install tensorflow
+
 # Configurar el directorio de trabajo en /app
 WORKDIR /app
 
