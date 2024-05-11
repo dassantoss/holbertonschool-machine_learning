@@ -3,7 +3,6 @@
 This module defines a function to build, train, and save a neural network
 classifier using TensorFlow.
 """
-import numpy as np
 import tensorflow.compat.v1 as tf  # type: ignore
 tf.disable_eager_execution()
 calculate_accuracy = __import__('3-calculate_accuracy').calculate_accuracy
