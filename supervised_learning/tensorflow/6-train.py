@@ -29,12 +29,15 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes, activations, alpha,
     Returns:
         str: The path where the model was saved.
     """
-    tf.reset_default_graph()
-    x, y = create_placeholders(X_train.shape[1], Y_train.shape[1])
+    nx = X_train.shape[1]
+    classes = Y_train.shape[1]
+    x, y = create_placeholders(nx, classes)
     y_pred = forward_prop(x, layer_sizes, activations)
     loss = calculate_loss(y, y_pred)
     accuracy = calculate_accuracy(y, y_pred)
     train_op = create_train_op(loss, alpha)
+    init = tf.global_variables_initializer()
+    saver = tf.train.Saver()
 
     # Add to collection later retrieval
     tf.add_to_collection('x', x)
@@ -44,23 +47,23 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes, activations, alpha,
     tf.add_to_collection('accuracy', accuracy)
     tf.add_to_collection('train_op', train_op)
 
-    saver = tf.train.Saver()
-    init = tf.global_variables_initializer()
     with tf.Session() as sess:
         sess.run(init)
         for i in range(iterations + 1):
-            train_cost, train_acc, _ = \
-                sess.run([loss, accuracy, train_op],
-                         feed_dict={x: X_train, y: Y_train})
+            train_loss, train_accuracy = sess.run(
+                [loss, accuracy], feed_dict={x: X_train, y: Y_train})
+            valid_loss, valid_accuracy = sess.run(
+                [loss, accuracy], feed_dict={x: X_valid, y: Y_valid})
+
             if i % 100 == 0 or i == iterations:
-                valid_cost, valid_acc = \
-                    sess.run([loss, accuracy],
-                             feed_dict={x: X_valid, y: Y_valid})
                 print(f"After {i} iterations:")
-                print(f"\tTraining Cost: {train_cost}")
-                print(f"\tTraining Accuracy: {train_acc}")
-                print(f"\tValidation Cost: {valid_cost}")
-                print(f"\tValidation Accuracy: {valid_acc}")
+                print(f"\tTraining Cost: {train_loss}")
+                print(f"\tTraining Accuracy: {train_accuracy}")
+                print(f"\tValidation Cost: {valid_loss}")
+                print(f"\tValidation Accuracy: {valid_accuracy}")
+
+            if i < iterations:
+                sess.run(train_op, feed_dict={x: X_train, y: Y_train})
 
         saved_path = saver.save(sess, save_path)
         return saved_path
