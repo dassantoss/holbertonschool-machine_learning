@@ -21,12 +21,12 @@ def create_batch_norm_layer(prev, n, activation):
     # Create a dense layer
     dense = tf.keras.layers.Dense(units=n, kernel_initializer=init)
     Z = dense(prev)
-    
+
     # Create a batch normalization layer
     gamma = tf.Variable(tf.ones([n]), trainable=True)
     beta = tf.Variable(tf.zeros([n]), trainable=True)
     mean, variance = tf.nn.moments(Z, axes=0)
     Z_norm = tf.nn.batch_normalization(Z, mean, variance, beta, gamma, 1e-7)
-    
+
     # Apply the activation function
     return activation(Z_norm)
