@@ -28,3 +28,8 @@ supervised_learning/tensorflow/checkpoint
 supervised_learning/optimization/MNIST.npz
 supervised_learning/optimization/model.h5
 supervised_learning/optimization/Binary_Train.npz
+supervised_learning/optimization/Companys.xlsx
+supervised_learning/optimization/Customers.xlsx
+supervised_learning/optimization/deExcelACSV.py
+supervised_learning/optimization/email_list.csv
+supervised_learning/optimization/Providers.xlsx
