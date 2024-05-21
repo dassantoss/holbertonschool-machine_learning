@@ -33,3 +33,5 @@ supervised_learning/optimization/Customers.xlsx
 supervised_learning/optimization/deExcelACSV.py
 supervised_learning/optimization/email_list.csv
 supervised_learning/optimization/Providers.xlsx
+supervised_learning/error_analysis/confusion.npz
+supervised_learning/error_analysis/labels_logits.npz
