@@ -24,7 +24,7 @@ def create_confusion_matrix(labels, logits):
     classes = labels.shape[1]
 
     # Initialize the confusion matrix
-    confusion_matrix = np.zeros((classes, classes), dtype=int)
+    confusion_matrix = np.zeros((classes, classes), dtype=float)
 
     # Populate the confusion matrix
     for true_label, pred_label in zip(true_labels, pred_labels):
