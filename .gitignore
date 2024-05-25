@@ -35,3 +35,4 @@ supervised_learning/optimization/email_list.csv
 supervised_learning/optimization/Providers.xlsx
 supervised_learning/error_analysis/confusion.npz
 supervised_learning/error_analysis/labels_logits.npz
+supervised_learning/regularization/model_reg.h5
