@@ -19,8 +19,9 @@ def l2_reg_create_layer(prev, n, activation, lambtha):
         tensor: The output of the new layer.
     """
     # Weight initialization: He et. al
-    init_weights = tf.keras.initializers.VarianceScaling(scale=2.0, mode="fan_avg")
-    
+    init_weights = tf.keras.initializers.VarianceScaling(scale=2.0,
+                                                         mode="fan_avg")
+
     # Regularization for this layer's loss: L2 regularizer
     l2_regularizer = tf.keras.regularizers.L2(lambtha)
 
