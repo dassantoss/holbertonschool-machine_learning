@@ -18,12 +18,6 @@ def l2_reg_cost(cost, model):
         tensor: A tensor containing the total cost for each layer of the
             network, accounting for L2 regularization.
     """
-    l2_cost = cost
-    for layer in model.layers:
-        if (hasattr(layer, 'kernel_regularizer') and
-                layer.kernel_regularizer is not None):
-            l2_cost += tf.reduce_sum(layer.kernel_regularizer(layer.kernel))
-        if (hasattr(layer, 'bias_regularizer') and
-                layer.bias_regularizer is not None):
-            l2_cost += tf.reduce_sum(layer.bias_regularizer(layer.bias))
-    return l2_cost
+    regularization_loss = tf.add_n(model.losses)
+    total_cost = cost + regularization_loss
+    return total_cost
