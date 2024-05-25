@@ -3,7 +3,7 @@
 This module contains a function that determines if you should stop
 gradient descent early.
 """
-import tensorflow as tf
+import numpy as np
 
 
 def early_stopping(cost, opt_cost, threshold, patience, count):
