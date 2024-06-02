@@ -22,8 +22,8 @@ def train_model(network, data, labels, batch_size, epochs, verbose=True,
         shuffle (bool): Determines whether to shuffle the batches every epoch.
 
     Returns:
-        keras.callbacks.History: The History object generated after training the
-        model.
+        keras.callbacks.History: The History object generated after training
+        the model.
     """
     history = network.fit(
         data,
