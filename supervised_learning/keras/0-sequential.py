@@ -2,13 +2,13 @@
 """
 Builds a neural network with the Keras library.
 """
-from tensorflow import keras as K
+import tensorflow.keras as K
 
 
 def build_model(nx, layers, activations, lambtha, keep_prob):
     """
     Builds a neural network with the Keras library.
-    
+
     Args:
         nx (int): Number of input features.
         layers (list): List with the number of nodes in each layer.
