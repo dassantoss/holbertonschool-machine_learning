@@ -41,3 +41,7 @@ supervised_learning/regularization/EjerciciosExcel-MAYAB.xlsx
 supervised_learning/keras/network1.keras
 supervised_learning/keras/network2.keras
 supervised_learning/keras/config1.json
+math/convolutions_and_pooling/animals_1.npz
+math/data/Binary_Dev.npz
+math/data/Binary_Train.npz
+math/data/MNIST.npz
