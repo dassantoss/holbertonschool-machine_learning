@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import numpy as np
 """Performs a valid convolution on grayscale images"""
 import numpy as np
 
