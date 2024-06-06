@@ -58,6 +58,6 @@ def conv_forward(A_prev, W, b, activation, padding="same", stride=(1, 1)):
             region = A_prev_padded[:, i*sh:i*sh+kh, j*sw:j*sw+kw, :]
             for k in range(c_new):
                 Z[:, i, j, k] = np.sum((region * W[:, :, :, k]),
-                                               axis=(1, 2, 3))
+                                       axis=(1, 2, 3))
 
     return activation(Z + b)
