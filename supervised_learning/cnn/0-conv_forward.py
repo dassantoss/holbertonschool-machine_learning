@@ -49,16 +49,14 @@ def conv_forward(A_prev, W, b, activation, padding="same", stride=(1, 1)):
     output_w = (w_prev + 2 * pw - kw) // sw + 1
 
     A_prev_padded = np.pad(A_prev, ((0, 0), (ph, ph), (pw, pw), (0, 0)),
-                           'constant')
+                           mode='constant')
 
     Z = np.zeros((m, output_h, output_w, c_new))
 
     for i in range(output_h):
         for j in range(output_w):
-            # Extract region from padded input
             region = A_prev_padded[:, i*sh:i*sh+kh, j*sw:j*sw+kw, :]
             for k in range(c_new):
-                # Convolve each input (m) in the region, using kernel k
                 Z[:, i, j, k] = np.sum((region * W[:, :, :, k]),
                                                axis=(1, 2, 3))
 
