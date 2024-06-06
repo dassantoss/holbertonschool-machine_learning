@@ -36,7 +36,7 @@ def conv_forward(A_prev, W, b, activation, padding="same", stride=(1, 1)):
         numpy.ndarray: Output of the convolutional layer.
     """
     m, h_prev, w_prev, c_prev = A_prev.shape
-    kh, kw, c_prev, c_new = W.shape
+    kh, kw, _, c_new = W.shape
     sh, sw = stride
 
     if padding == "same":
@@ -45,25 +45,25 @@ def conv_forward(A_prev, W, b, activation, padding="same", stride=(1, 1)):
     else:
         ph, pw = 0, 0
 
-    output_h = (h_prev + 2 * ph - kh) // sh + 1
-    output_w = (w_prev + 2 * pw - kw) // sw + 1
-
     A_prev_padded = np.pad(A_prev, ((0, 0), (ph, ph), (pw, pw), (0, 0)),
                            mode='constant')
 
-    Z = np.zeros((m, output_h, output_w, c_new))
+    h_out = (h_prev + 2 * ph - kh) // sh + 1
+    w_out = (w_prev + 2 * pw - kw) // sw + 1
 
-    for i in range(output_h):
-        for j in range(output_w):
+    Z = np.zeros((m, h_out, w_out, c_new))
+
+    for i in range(h_out):
+        for j in range(w_out):
+            vert_start = i * sh
+            vert_end = vert_start + kh
+            horiz_start = j * sw
+            horiz_end = horiz_start + kw
+
+            A_slice = A_prev_padded[:, vert_start:vert_end,
+                                    horiz_start:horiz_end, :]
             for k in range(c_new):
-                vert_start = i * sh
-                vert_end = vert_start + kh
-                horiz_start = j * sw
-                horiz_end = horiz_start + kw
-                A_slice = A_prev_padded[:, vert_start:vert_end,
-                                        horiz_start:horiz_end, :]
                 Z[:, i, j, k] = np.sum(A_slice * W[:, :, :, k],
-                                       axis=(1, 2, 3))
+                                       axis=(1, 2, 3)) + b[:, :, :, k]
 
-    Z += b
     return activation(Z)
