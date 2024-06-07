@@ -36,7 +36,7 @@ def pool_backward(dA, A_prev, kernel_shape, stride=(1, 1), mode='max'):
     m, h_new, w_new, c_new = dA.shape
 
     # Initialize dA_prev
-    dA_prev = np.zeros(shape=A_prev.shape)
+    dA_prev = np.zeros_like(A_prev)
 
     for i in range(h_new):
         for j in range(w_new):
@@ -57,8 +57,10 @@ def pool_backward(dA, A_prev, kernel_shape, stride=(1, 1), mode='max'):
                                                          np.newaxis])
             elif mode == 'avg':
                 # Backward Average Pooling
-                da = dA[:, i, j, :, np.newaxis, np.newaxis]
+                da = dA[:, i, j, :]
+                shape = (m, kh, kw, c)
+                avg_val = da[:, np.newaxis, np.newaxis, :] / (kh * kw)
                 dA_prev[:, vert_start:vert_end, horiz_start:horiz_end, :] += (
-                    da / (kh * kw))
+                    np.tile(avg_val, (1, kh, kw, 1)))
 
     return dA_prev
