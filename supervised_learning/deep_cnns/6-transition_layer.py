@@ -17,17 +17,24 @@ def transition_layer(X, nb_filters, compression):
         tensor: output of the transition layer.
         int: number of filters within the output.
     """
-    # Batch Normalization and ReLU activation
-    X = K.layers.BatchNormalization()(X)
-    X = K.layers.Activation('relu')(X)
+    # Reduce number of filters in output by the compression factor θ
+    new_nb_filters = int(nb_filters * compression)
 
-    # 1x1 Convolution with compression factor
-    nb_filters = int(nb_filters * compression)
-    X = K.layers.Conv2D(nb_filters, (1, 1), padding='same',
-                        kernel_initializer=K.initializers.he_normal(seed=0)
-                        )(X)
+    # Initializer he_normal with seed 0
+    init = K.initializers.HeNormal(seed=0)
 
-    # Average Pooling
-    X = K.layers.AveragePooling2D((2, 2), strides=(2, 2), padding='same')(X)
+    norm = K.layers.BatchNormalization()(X)
+    activ = K.layers.Activation(activation="relu")(norm)
 
-    return X, nb_filters
+    # 1x1 "bottleneck" convolution, compressed by θ factor
+    conv = K.layers.Conv2D(filters=new_nb_filters,
+                           kernel_size=(1, 1),
+                           padding="same",
+                           kernel_initializer=init)(activ)
+
+    # Average Pooling 2x2, stride 2
+    avg_pool = K.layers.AvgPool2D(pool_size=(2, 2),
+                                  strides=(2, 2),
+                                  padding="same")(conv)
+
+    return avg_pool, new_nb_filters

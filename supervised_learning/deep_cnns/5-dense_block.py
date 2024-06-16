@@ -18,25 +18,32 @@ def dense_block(X, nb_filters, growth_rate, layers):
         tensor: concatenated output of each layer within the dense block.
         int: number of filters within the concatenated outputs.
     """
-    for i in range(layers):
-        # Bottleneck layer
-        bn = K.layers.BatchNormalization()(X)
-        relu = K.layers.Activation('relu')(bn)
-        bottleneck = \
-            K.layers.Conv2D(4 * growth_rate, (1, 1), padding='same',
-                            kernel_initializer=K.initializers.he_normal(seed=0)
-                            )(relu)
+    # Initializer he_normal with seed 0
+    init = K.initializers.HeNormal(seed=0)
 
-        # Composite function (3x3 convolution)
-        bn = K.layers.BatchNormalization()(bottleneck)
-        relu = K.layers.Activation('relu')(bn)
-        conv = \
-            K.layers.Conv2D(growth_rate, (3, 3), padding='same',
-                            kernel_initializer=K.initializers.he_normal(seed=0)
-                            )(relu)
+    for layer_i in range(layers):
+        # Batch normalization and ReLU activation before convolution
+        norm1 = K.layers.BatchNormalization()(X)
+        activ1 = K.layers.Activation(activation="relu")(norm1)
 
-        # Concatenate the input with the output
-        X = K.layers.Concatenate()([X, conv])
+        # 1x1 "bottleneck" convolution, with '4 x k' channels
+        conv1 = K.layers.Conv2D(filters=4 * growth_rate,
+                                kernel_size=(1, 1),
+                                padding="same",
+                                kernel_initializer=init)(activ1)
+
+        # BatchNorm and ReLU, before 3x3 convolution again
+        norm2 = K.layers.BatchNormalization()(conv1)
+        activ2 = K.layers.Activation("relu")(norm2)
+        conv2 = K.layers.Conv2D(filters=growth_rate,
+                                kernel_size=(3, 3),
+                                padding="same",
+                                kernel_initializer=init)(activ2)
+
+        # Concatenate inputs and new outputs on channel axis
+        X = K.layers.Concatenate()([X, conv2])
+
+        # Update the number of filters by the growth rate
         nb_filters += growth_rate
 
     return X, nb_filters
