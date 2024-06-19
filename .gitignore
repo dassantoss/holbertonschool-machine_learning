@@ -45,3 +45,4 @@ math/convolutions_and_pooling/animals_1.npz
 math/data/Binary_Dev.npz
 math/data/Binary_Train.npz
 math/data/MNIST.npz
+supervised_learning/transfer_learning/cifar10.h5
