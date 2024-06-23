@@ -4,6 +4,7 @@ Transfer Knowledge with DenseNet121 on CIFAR-10
 """
 from tensorflow import keras as K
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 
 def preprocess_data(X, Y):
@@ -61,6 +62,38 @@ def build_model():
     return model
 
 
+def plot_history(history, finetuning_history):
+    """
+    Plots the training and validation accuracy and loss.
+
+    history: History object from the initial training
+    finetuning_history: History object from the fine-tuning
+    """
+    # Combine histories
+    acc = history.history['accuracy'] + \
+        finetuning_history.history['accuracy']
+    val_acc = history.history['val_accuracy'] + \
+        finetuning_history.history['val_accuracy']
+    loss = history.history['loss'] + finetuning_history.history['loss']
+    val_loss = history.history['val_loss'] + \
+        finetuning_history.history['val_loss']
+    epochs = range(len(acc))
+
+    plt.figure()
+    plt.plot(epochs, acc, 'bo', label='Training accuracy')
+    plt.plot(epochs, val_acc, 'b', label='Validation accuracy')
+    plt.title('Training and validation accuracy')
+    plt.legend()
+    plt.savefig('accuracy_plot.png')
+
+    plt.figure()
+    plt.plot(epochs, loss, 'bo', label='Training loss')
+    plt.plot(epochs, val_loss, 'b', label='Validation loss')
+    plt.title('Training and validation loss')
+    plt.legend()
+    plt.savefig('loss_plot.png')
+
+
 if __name__ == "__main__":
     # Load CIFAR-10 data
     (x_train, y_train), (x_test, y_test) = K.datasets.cifar10.load_data()
@@ -97,7 +130,6 @@ if __name__ == "__main__":
     model.compile(optimizer=K.optimizers.Adam(1e-5),
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
-    model.summary()
 
     finetuning_history = model.fit(x_train, y_train,
                                    epochs=10,
@@ -105,9 +137,12 @@ if __name__ == "__main__":
                                    callbacks=[early_stopping, checkpoint],
                                    verbose=1)
 
-    # Save the final model in h5 format
-    model.save(filepath='cifar10.h5')
+    # Save the final model in keras format
+    model.save(filepath='cifar10.keras')
 
     # Evaluate on test set
     loss, accuracy = model.evaluate(x_test, y_test, verbose=1)
     print(f'Test accuracy: {accuracy * 100:.2f}%')
+
+    # Plot and save accuracy and loss graphs
+    plot_history(history, finetuning_history)
