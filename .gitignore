@@ -47,3 +47,5 @@ math/data/Binary_Train.npz
 math/data/MNIST.npz
 supervised_learning/transfer_learning/cifar10.h5
 supervised_learning/transfer_learning/cifar10.keras
+supervised_learning/transfer_learning/best_model.keras
+supervised_learning/transfer_learning/1cifar10.h5
