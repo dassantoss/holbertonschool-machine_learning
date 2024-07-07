@@ -238,10 +238,19 @@ class Yolo:
         """
         images = []
         image_paths = []
+
+        if not os.path.isdir(folder_path):
+            raise FileNotFoundError(f"The directory \
+                                    {folder_path} does not exist")
+
+        valid_extensions = ('.jpg', '.jpeg', '.png')
+
         for filename in os.listdir(folder_path):
-            if filename.endswith(('.jpg', '.jpeg', '.png')):
+            if filename.lower().endswith(valid_extensions):
                 image_path = os.path.join(folder_path, filename)
                 image = cv2.imread(image_path)
-                images.append(image)
-                image_paths.append(image_path)
-                return images, image_paths
+                if image is not None:
+                    images.append(image)
+                    image_paths.append(image_path)
+
+        return images, image_paths
