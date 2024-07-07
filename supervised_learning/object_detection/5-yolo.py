@@ -257,33 +257,34 @@ class Yolo:
 
     def preprocess_images(self, images):
         """
-        Preprocess the images for the Darknet model
+        Resizes and rescales images for the Darknet model.
 
         Parameters:
-        - images: list of images as numpy.ndarrays
+        - images: a list of images as numpy.ndarrays
 
         Returns:
-        - pimages: numpy.ndarray containing all of the
-            preprocessed images
-        - image_shapes: numpy.ndarray containing the original
-            height and width of the images
+        - pimages: a numpy.ndarray of shape (ni, input_h, input_w, 3)
+            containing all of the preprocessed images
+        - image_shapes: a numpy.ndarray of shape (ni, 2) containing the
+            original height and width of the images
         """
+        pimages = []
+        image_shapes = []
         input_h = self.model.input.shape[1]
         input_w = self.model.input.shape[2]
 
-        pimages = []
-        image_shapes = []
+        for img in images:
+            # Resize image with inter-cubic interpolation
+            resized_img = cv2.resize(
+                img, (input_w, input_h), interpolation=cv2.INTER_CUBIC)
 
-        for image in images:
-            image_shapes.append(image.shape[:2])
-            # Resize the image with inter-cubic interpolation
-            pimage = cv2.resize(image, (input_w, input_h),
-                                interpolation=cv2.INTER_CUBIC)
-            # Rescale the image to have pixel values in the range [0, 1]
-            pimage = pimage / 255.0
-            pimages.append(pimage)
+            # Rescale pixel values from [0, 255] to [0, 1]
+            pimages.append(resized_img / 255.0)
+
+            # Add image shape to shapes array
+            orig_h, orig_w = img.shape[:2]
+            image_shapes.append([orig_h, orig_w])
 
         pimages = np.array(pimages)
         image_shapes = np.array(image_shapes)
-
         return pimages, image_shapes
