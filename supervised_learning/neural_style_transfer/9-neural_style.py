@@ -390,4 +390,16 @@ class NST:
                 print(f"Cost at iter {i}: {J_total}, cont {J_content}, "
                       f"style {J_style}")
 
+        # Validaciones finales de la imagen generada
+        if not isinstance(best_image, np.ndarray):
+            raise TypeError("generated_image must be a numpy array")
+
+        if best_image.shape != self.content_image.shape:
+            raise ValueError(
+                f"generated_image must be of shape {self.content_image.shape}")
+
+        if not (0 <= best_image.min() <= 1 and 0 <= best_image.max() <= 1):
+            raise ValueError(
+                "generated_image pixel values must be in range [0, 1]")
+
         return best_image, best_cost
