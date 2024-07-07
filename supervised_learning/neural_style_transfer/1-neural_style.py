@@ -120,16 +120,22 @@ class NST:
         Returns:
             model (tf.keras.Model): The Keras model used to calculate cost.
         """
-        # Load the VGG19 model pre-trained on ImageNet
-        vgg = tf.keras.applications.VGG19(include_top=False,
-                                          weights='imagenet')
+        # Load VGG19 model from Keras API
+        vgg = tf.keras.applications.VGG19(
+            include_top=False, weights='imagenet')
+
         vgg.trainable = False
+        # Replace MaxPooling2D layers with AveragePooling2D layers
+        for layer in vgg.layers:
+            if isinstance(layer, tf.keras.layers.MaxPooling2D):
+                layer.__class__ = tf.keras.layers.AveragePooling2D
 
-        # Map layer names to the output tensors
-        outputs = [vgg.get_layer(name).output for name in self.style_layers]
-        outputs.append(vgg.get_layer(self.content_layer).output)
+        # get outputs of the style and content layers from modified VGG19
+        style_outputs = [vgg.get_layer(
+            name).output for name in self.style_layers]
+        content_output = vgg.get_layer(self.content_layer).output
 
-        # Create the model that will return these outputs
-        model = tf.keras.Model([vgg.input], outputs)
-
-        return model
+        # Create the model, make it non-trainable and return it
+        self.model = tf.keras.models.Model(
+            inputs=vgg.input,
+            outputs=style_outputs + [content_output])
