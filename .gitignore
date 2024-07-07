@@ -56,3 +56,4 @@ supervised_learning/object_detection/coco_classes.txt
 supervised_learning/object_detection/yolo_images.zip
 supervised_learning/object_detection/yolo.h5
 supervised_learning/object_detection/yolovenv/bin/activate
+supervised_learning/neural_style_transfer/vgg_base.h5
