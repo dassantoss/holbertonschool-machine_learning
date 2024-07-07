@@ -4,9 +4,6 @@ Neural Style Transfer
 """
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.applications import VGG19
-from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input
 
 
 class NST:
@@ -123,17 +120,16 @@ class NST:
         Returns:
             model (tf.keras.Model): The Keras model used to calculate cost.
         """
-        # Load VGG19 model pre-trained on ImageNet
-        vgg = VGG19(include_top=False, weights='imagenet')
-
-        # Set the model's trainable parameter to False
+        # Load the VGG19 model pre-trained on ImageNet
+        vgg = tf.keras.applications.VGG19(include_top=False,
+                                          weights='imagenet')
         vgg.trainable = False
 
-        # Get the outputs of the specified layers
+        # Map layer names to the output tensors
         outputs = [vgg.get_layer(name).output for name in self.style_layers]
         outputs.append(vgg.get_layer(self.content_layer).output)
 
-        # Create the model
-        model = Model(inputs=vgg.input, outputs=outputs)
+        # Create the model that will return these outputs
+        model = tf.keras.Model([vgg.input], outputs)
 
         return model
