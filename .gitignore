@@ -11,6 +11,9 @@ ENV/
 # IDE
 .vscode/
 
+# Ignore virtual environment directories
+supervised_learning/object_detection/yolovenv
+
 # Miscellaneous
 .DS_Store
 Thumbs.db
@@ -52,3 +55,4 @@ supervised_learning/transfer_learning/1cifar10.h5
 supervised_learning/object_detection/coco_classes.txt
 supervised_learning/object_detection/yolo_images.zip
 supervised_learning/object_detection/yolo.h5
+supervised_learning/object_detection/yolovenv/bin/activate
