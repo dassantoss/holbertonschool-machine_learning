@@ -91,4 +91,11 @@ class Yolo:
             box_confidences.append(box_confidence)
             box_class_probs.append(box_class_prob)
 
+        # Adjust boxes to the original image size
+        for i in range(len(boxes)):
+            boxes[i][..., 0] *= image_width
+            boxes[i][..., 1] *= image_height
+            boxes[i][..., 2] *= image_width
+            boxes[i][..., 3] *= image_height
+
         return boxes, box_confidences, box_class_probs
