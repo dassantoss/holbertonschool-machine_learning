@@ -276,7 +276,7 @@ class Yolo:
         for img in images:
             # Resize image with inter-cubic interpolation
             resized_img = cv2.resize(
-                img, (input_w, input_h), interpolation=cv2.INTER_CUBIC)
+                img, (input_h, input_w), interpolation=cv2.INTER_CUBIC)
 
             # Rescale pixel values from [0, 255] to [0, 1]
             pimages.append(resized_img / 255.0)
