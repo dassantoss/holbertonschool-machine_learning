@@ -327,23 +327,21 @@ class NST:
 
         return gradients, J_total, J_content, J_style
 
-    def generate_image(self, iterations=1000, step=None, lr=0.01,
-                       beta1=0.9, beta2=0.99):
+    def generate_image(self, iterations=1000, step=None, lr=0.01, beta1=0.9,
+                       beta2=0.99):
         """
         Generates the neural style transferred image.
 
-        - `iterations`: the number of iterations to perform gradient
-        descent over
-        - `step`: if not None, the step at which you should print
-            information about the training, including the final
-            iteration
-        - `lr`: the learning rate for gradient descent
-        - `beta1`: the beta1 parameter for gradient descent
-        - `beta2`: the beta2 parameter for gradient descent
+        Parameters:
+        - iterations: Number of iterations to perform gradient descent.
+        - step: Step at which to print information about the training.
+        - lr: Learning rate for gradient descent.
+        - beta1: Beta1 parameter for Adam optimization.
+        - beta2: Beta2 parameter for Adam optimization.
 
-        Returns: generated_image, cost
-        - `generated_image`: the best generated image
-        - `cost`: the best cost
+        Returns:
+        - generated_image: The best generated image.
+        - cost: The best cost.
         """
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
@@ -361,45 +359,36 @@ class NST:
             raise ValueError("lr must be positive")
         if not isinstance(beta1, float):
             raise TypeError("beta1 must be a float")
-        if not 0 <= beta1 <= 1:
+        if not (0 <= beta1 <= 1):
             raise ValueError("beta1 must be in the range [0, 1]")
         if not isinstance(beta2, float):
             raise TypeError("beta2 must be a float")
-        if not 0 <= beta2 <= 1:
+        if not (0 <= beta2 <= 1):
             raise ValueError("beta2 must be in the range [0, 1]")
 
-        generated_image = tf.Variable(self.content_image, dtype=tf.float32)
+        generated_image = tf.Variable(self.content_image,
+                                      dtype=tf.float32)
+
         optimizer = tf.optimizers.Adam(learning_rate=lr,
                                        beta1=beta1, beta2=beta2)
 
-        best_cost = float("inf")
+        best_cost = float('inf')
         best_image = None
 
-        for i in range(iterations + 1):
-            gradients, J_total, J_content, J_style = \
-                self.compute_grads(generated_image)
-            optimizer.apply_gradients([(gradients, generated_image)])
-            clipped_image = tf.clip_by_value(generated_image, 0.0, 1.0)
-            generated_image.assign(clipped_image)
+        for i in range(iterations):
+            with tf.GradientTape() as tape:
+                J_total, J_content, J_style = self.total_cost(generated_image)
+
+            grads = tape.gradient(J_total, generated_image)
+            optimizer.apply_gradients([(grads, generated_image)])
+            clipped = tf.clip_by_value(generated_image, 0.0, 1.0)
+            generated_image.assign(clipped)
 
             if J_total < best_cost:
                 best_cost = J_total
                 best_image = generated_image.numpy()
 
-            if step is not None and i % step == 0:
-                print(f"Cost at iter {i}: {J_total}, cont {J_content}, "
-                      f"style {J_style}")
-
-        # Validaciones finales de la imagen generada
-        if not isinstance(best_image, np.ndarray):
-            raise TypeError("generated_image must be a numpy array")
-
-        if best_image.shape != self.content_image.shape:
-            raise ValueError(
-                f"generated_image must be of shape {self.content_image.shape}")
-
-        if not (0 <= best_image.min() <= 1 and 0 <= best_image.max() <= 1):
-            raise ValueError(
-                "generated_image pixel values must be in range [0, 1]")
+            if step is not None and (i + 1) % step == 0:
+                print(f"Cost at iteration {i + 1}: {J_total}, content {J_content}, style {J_style}")
 
         return best_image, best_cost
