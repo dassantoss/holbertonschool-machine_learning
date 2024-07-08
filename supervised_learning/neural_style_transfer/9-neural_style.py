@@ -369,8 +369,8 @@ class NST:
         generated_image = tf.Variable(self.content_image,
                                       dtype=tf.float32)
 
-        optimizer = tf.optimizers.Adam(learning_rate=lr,
-                                       beta1=beta1, beta2=beta2)
+        optimizer = tf.optimizers.Adam(learning_rate=lr, beta1=beta1,
+                                       beta2=beta2)
 
         best_cost = float('inf')
         best_image = None
@@ -389,6 +389,7 @@ class NST:
                 best_image = generated_image.numpy()
 
             if step is not None and (i + 1) % step == 0:
-                print(f"Cost at iteration {i + 1}: {J_total}, content {J_content}, style {J_style}")
+                print("Cost at iteration {}: {}, content {}, style {}".format(
+                    i + 1, J_total, J_content, J_style))
 
         return best_image, best_cost
