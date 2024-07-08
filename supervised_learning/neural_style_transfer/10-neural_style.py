@@ -324,8 +324,7 @@ class NST:
 
         return gradients, J_total, J_content, J_style
 
-    def generate_image(self, iterations=1000, step=None, lr=0.01, beta1=0.9,
-                       beta2=0.99):
+    def generate_image(self, iterations=1000, step=None, lr=0.01, beta1=0.9, beta2=0.99):
         """
         Generates the neural style transferred image.
 
@@ -348,8 +347,7 @@ class NST:
             if not isinstance(step, int):
                 raise TypeError("step must be an integer")
             if step <= 0 or step >= iterations:
-                raise ValueError(
-                    "step must be positive and less than iterations")
+                raise ValueError("step must be positive and less than iterations")
         if not isinstance(lr, (float, int)):
             raise TypeError("lr must be a number")
         if lr <= 0:
@@ -363,19 +361,16 @@ class NST:
         if not (0 <= beta2 <= 1):
             raise ValueError("beta2 must be in the range [0, 1]")
 
-        generated_image = tf.Variable(self.content_image,
-                                      dtype=tf.float32)
+        generated_image = tf.Variable(self.content_image, dtype=tf.float32)
 
-        optimizer = tf.optimizers.Adam(learning_rate=lr, beta1=beta1,
-                                       beta2=beta2)
+        optimizer = tf.optimizers.Adam(learning_rate=lr, beta1=beta1, beta2=beta2)
 
         best_cost = float('inf')
         best_image = None
 
         for i in range(iterations):
             with tf.GradientTape() as tape:
-                J_total, J_content, J_style, J_var = \
-                    self.total_cost(generated_image)
+                J_total, J_content, J_style, J_var = self.total_cost(generated_image)
 
             grads = tape.gradient(J_total, generated_image)
             optimizer.apply_gradients([(grads, generated_image)])
@@ -387,7 +382,7 @@ class NST:
                 best_image = generated_image.numpy()
 
             if step is not None and (i + 1) % step == 0:
-                print("Cost at iteration {}: {}, content {}, style {}, var {}".format(  # noqa
+                print("Cost at iteration {}: {}, content {}, style {}, var {}".format(
                     i + 1, J_total, J_content, J_style, J_var))
 
         return best_image, best_cost
@@ -398,12 +393,16 @@ class NST:
         Calculates the variational cost for the generated image.
 
         Parameters:
-        - generated_image (tf.Tensor): The generated image of shape
-            (1, nh, nw, 3).
+        - generated_image (tf.Tensor): The generated image of shape (1, nh, nw, 3).
 
         Returns:
         - tf.Tensor: The variational cost.
         """
+        if not isinstance(generated_image, tf.Tensor):
+            raise TypeError("generated_image must be a tensor")
+        if len(generated_image.shape) != 4 or generated_image.shape[0] != 1 or generated_image.shape[3] != 3:
+            raise ValueError("generated_image must have shape (1, nh, nw, 3)")
+
         dy = generated_image[:, 1:, :, :] - generated_image[:, :-1, :, :]
         dx = generated_image[:, :, 1:, :] - generated_image[:, :, :-1, :]
-        return tf.reduce_sum(tf.square(dx)) + tf.reduce_sum(tf.square(dy))
+        return tf.reduce_sum(tf.square(dy)) + tf.reduce_sum(tf.square(dx))
