@@ -59,3 +59,4 @@ supervised_learning/object_detection/yolovenv/bin/activate
 supervised_learning/neural_style_transfer/vgg_base.h5
 unsupervised_learning/dimensionality_reduction/72a86270e2a1c2cbc14b.txt
 unsupervised_learning/dimensionality_reduction/mnist2500_X.txt
+unsupervised_learning/dimensionality_reduction/mnist2500_labels.txt
