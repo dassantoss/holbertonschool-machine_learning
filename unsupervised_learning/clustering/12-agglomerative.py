@@ -24,11 +24,6 @@ def agglomerative(X, dist):
     # Display the dendrogram
     dendrogram = scipy.cluster.hierarchy.dendrogram(
         linkage_matrix, color_threshold=dist)
-
-    # # Cleaner labeling
-    # plt.title('Dendrogram')
-    # plt.xlabel('Data Points')
-    # plt.ylabel('Euclidean Distance')
     plt.show()
 
     # Return clusters based on the given distance threshold
