@@ -5,15 +5,21 @@ import numpy as np
 
 def initialize(X, k):
     """
-    Initializes cluster centroids for K-means
+    Initializes cluster centroids for K-means clustering.
 
     Parameters:
-    X (numpy.ndarray): The dataset of shape (n, d)
-    k (int): The number of clusters
+    X (numpy.ndarray): A 2D numpy array of shape (n, d) containing the dataset
+                       that will be used for K-means clustering.
+                       - n is the number of data points
+                       - d is the number of dimensions for each data point
+    k (int): A positive integer representing the number of clusters.
 
     Returns:
-    numpy.ndarray: The initialized centroids of shape (k, d) or None on failure
+    numpy.ndarray: A 2D numpy array of shape (k, d) containing the initialized
+                   centroids for each cluster.
+                   Returns None on failure
     """
+
     if not isinstance(X, np.ndarray) or X.ndim != 2:
         return None
     if not isinstance(k, int) or k <= 0:
@@ -22,22 +28,27 @@ def initialize(X, k):
     min_vals = X.min(axis=0)
     max_vals = X.max(axis=0)
 
-    centroids = np.random.uniform(min_vals, max_vals, (k, X.shape[1]))
-    return centroids
+    return np.random.uniform(min_vals, max_vals, size=(k, X.shape[1]))
 
 
 def kmeans(X, k, iterations=1000):
     """
-    Performs K-means clustering on a dataset
+    Performs K-means clustering on a dataset.
 
     Parameters:
-    X (numpy.ndarray): The dataset of shape (n, d)
-    k (int): The number of clusters
-    iterations (int): The maximum number of iterations
+    X (numpy.ndarray): A 2D numpy array of shape (n, d) containing the dataset.
+                       - n is the number of data points
+                       - d is the number of dimensions for each data point
+    k (int): A positive integer representing the number of clusters.
+    iterations (int): A positive integer representing the maximum number of
+                      iterations that should be performed.
 
     Returns:
-    numpy.ndarray: Centroid means for each cluster
-    numpy.ndarray: Index of the cluster each data point belongs to
+    tuple: (centroids, clss) on success, or (None, None) on failure.
+           - centroids is a numpy.ndarray of shape (k, d) containing the
+             entroid means for each cluster.
+           - clss is a numpy.ndarray of shape (n,) containing the index of the
+             cluster in centroids that each data point belongs to.
     """
     if not isinstance(X, np.ndarray) or X.ndim != 2:
         return None, None
