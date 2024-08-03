@@ -40,21 +40,22 @@ def kmeans(X, k, iterations=1000):
     numpy.ndarray: Centroid means for each cluster
     numpy.ndarray: Index of the cluster each data point belongs to
     """
-    if not isinstance(X, np.ndarray) or not isinstance(k, int):
-        return None
-    if X.ndim != 2 or k <= 0:
-        return None
+    if not isinstance(X, np.ndarray) or not isinstance(k, int) or \
+       not isinstance(iterations, int):
+        return None, None
+    if X.ndim != 2 or k <= 0 or iterations <= 0:
+        return None, None
 
-    n, d = X.shape
     centroids = initialize(X, k)
     if centroids is None:
         return None, None
 
-    for i in range(iterations):
+    for _ in range(iterations):
         # Assign each data point to the nearest centroid
         distances = np.linalg.norm(X[:, np.newaxis] - centroids, axis=2)
         clss = np.argmin(distances, axis=1)
 
+        # Calculate new centroids
         new_centroids = np.array([
             X[clss == j].mean(axis=0) if np.any(clss == j)
             else initialize(X, 1)[0]
