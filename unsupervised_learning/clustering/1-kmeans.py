@@ -54,11 +54,12 @@ def kmeans(X, k, iterations=1000):
         distances = np.linalg.norm(X[:, np.newaxis] - centroids, axis=2)
         clss = np.argmin(distances, axis=1)
 
-        new_centroids = np.array([
-            X[clss == j].mean(axis=0) if np.any(clss == j)
-            else initialize(X, 1)[0]
-            for j in range(k)
-        ])
+        new_centroids = np.zeros((k, X.shape[1]))
+        for j in range(k):
+            if np.any(clss == j):
+                new_centroids[j] = X[clss == j].mean(axis=0)
+            else:
+                new_centroids[j] = initialize(X, 1)[0]
 
         if np.allclose(centroids, new_centroids):
             break
