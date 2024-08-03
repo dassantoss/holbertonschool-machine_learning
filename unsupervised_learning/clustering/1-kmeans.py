@@ -51,16 +51,22 @@ def kmeans(X, k, iterations=1000):
         return None, None
 
     for _ in range(iterations):
+        prev_centroids = np.copy(centroids)
+
+        # Calculate distances and assign clusters
         distances = np.linalg.norm(X[:, np.newaxis] - centroids, axis=2)
         clss = np.argmin(distances, axis=1)
 
-        new_centroids = np.zeros((k, X.shape[1]))
+        # Calculate new centroids
+        new_centroids = np.zeros_like(centroids)
         for j in range(k):
-            if np.any(clss == j):
-                new_centroids[j] = X[clss == j].mean(axis=0)
-            else:
+            cluster_points = X[clss == j]
+            if len(cluster_points) == 0:
                 new_centroids[j] = initialize(X, 1)[0]
+            else:
+                new_centroids[j] = cluster_points.mean(axis=0)
 
+        # Check for convergence
         if np.allclose(centroids, new_centroids):
             break
 
