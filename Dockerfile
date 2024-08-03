@@ -35,6 +35,12 @@ RUN pip3 install numpy
 # Instalar pycodestyle
 RUN pip3 install pycodestyle==2.11.1
 
+# Instalar scikit-learn versión 1.5.0
+RUN pip3 install scikit-learn==1.5.0
+
+# Instalar scipy versión 1.11.4
+RUN pip3 install scipy==1.11.4
+
 # Instalar scikit-learn
 RUN pip3 install -U scikit-learn
 
