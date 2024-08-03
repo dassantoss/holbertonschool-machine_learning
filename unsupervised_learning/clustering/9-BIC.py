@@ -44,6 +44,8 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
         or not isinstance(kmin, int) or kmin <= 0
         or kmax is not None and (not isinstance(kmax, int) or kmax < kmin)
         or not isinstance(iterations, int) or iterations <= 0
+        or isinstance(kmax, int) and kmax <= kmin
+        or not isinstance(iterations, int) or iterations <= 0
         or not isinstance(tol, float) or tol < 0
         or not isinstance(verbose, bool)
     ):
@@ -53,13 +55,8 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
     if kmax is None:
         # Undefined, set to maximum possible
         kmax = n
-
-    if kmax < kmin or kmax > n:
+    if not isinstance(kmax, int) or kmax < 1 or kmax < kmin or kmax > n:
         return None, None, None, None
-
-    best_bic = np.inf
-    best_k = None
-    best_results = None
 
     b = []
     likelihoods = []
@@ -67,12 +64,13 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
     # With each cluster size from kmin to kmax
     for k in range(kmin, kmax + 1):
         # Find the best fit with the GMM and current cluster size k
-        pi, m, S, g, li = expectation_maximization(X, k, iterations, tol, verbose)
+        pi, m, S, g, li = expectation_maximization(
+            X, k, iterations, tol, verbose)
 
         if pi is None or m is None or S is None or g is None:
             return None, None, None, None
-        
-        # Calculate the number of parameters
+        # NOTE p is the number of parameters, so k * d with the means,
+        # k * d * (d + 1) with the covariance matrix, and k - 1 with the priors
         p = (k * d) + (k * d * (d + 1) // 2) + (k - 1)
         bic = p * np.log(n) - 2 * li
 
@@ -81,7 +79,8 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
         b.append(bic)
 
         # Compare current BIC to best observed BIC
-        if bic < best_bic:
+        if k == kmin or bic < best_bic:
+            # Update the return values
             best_bic = bic
             best_results = (pi, m, S)
             best_k = k
