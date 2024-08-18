@@ -73,25 +73,27 @@ class BayesianOptimization:
             Y_opt (numpy.ndarray): Optimal function value, shape (1,).
         """
         for _ in range(iterations):
+            # Find next best point to sample
             X_next, _ = self.acquisition()
 
-            # Convert both X_next and each point in self.gp.X to tuples for comparison
-            if tuple(X_next) in map(tuple, self.gp.X):
+            # Stop early if the next point has already been sampled
+            if np.any(np.isclose(X_next, self.gp.X)):
                 break
 
-            # Obtain the new sample from the black-box function
+            # Sample function at the proposed point
             Y_next = self.f(X_next)
 
-            # Update the Gaussian Process model
+            # Update our Gaussian Process with the new sample
             self.gp.update(X_next, Y_next)
 
-        # Get the optimal point and its corresponding function value
+        # Calc. optimal point and its function value
         if self.minimize:
-            idx_opt = np.argmin(self.gp.Y)
+            optimal_idx = np.argmin(self.gp.Y)
         else:
-            idx_opt = np.argmax(self.gp.Y)
+            optimal_idx = np.argmax(self.gp.Y)
 
-        X_opt = self.gp.X[idx_opt]
-        Y_opt = self.gp.Y[idx_opt]
+        self.gp.X = self.gp.X[:-1, :]
+        X_opt = self.gp.X[optimal_idx]
+        Y_opt = self.gp.Y[optimal_idx]
 
         return X_opt, Y_opt
