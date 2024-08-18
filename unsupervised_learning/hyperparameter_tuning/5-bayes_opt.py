@@ -76,7 +76,7 @@ class BayesianOptimization:
             X_next, _ = self.acquisition()
 
             # Check if the proposed point has already been sampled
-            if X_next in self.gp.X:
+            if np.any(np.all(self.gp.X == X_next, axis=1)):
                 break
 
             # Obtain the new sample from the black-box function
