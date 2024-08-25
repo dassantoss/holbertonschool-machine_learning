@@ -23,28 +23,34 @@ RUN apt-get update && apt-get install -y \
 # Limpiar cache de apt-get
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instalar Matplotlib y Pillow sin especificar la versión
-RUN pip3 install matplotlib Pillow
-
 # Establecer la versión de Python deseada y asegurar que es la predeterminada
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
-# Instalar Numpy
-RUN pip3 install numpy
+# Instalar Numpy compatible con TensorFlow
+RUN pip3 install numpy==1.24.3
+
+# Instalar Matplotlib y Pillow
+RUN pip3 install matplotlib Pillow
 
 # Instalar pycodestyle
 RUN pip3 install pycodestyle==2.11.1
 
-# Instalar scikit-learn versión 1.5.0
-RUN pip3 install scikit-learn==1.5.0
+# Instalar scikit-learn versión 1.3.2
+RUN pip3 install scikit-learn==1.3.2
 
-# Instalar scipy versión 1.11.4
-RUN pip3 install scipy==1.11.4
+# Instalar scipy versión 1.10.1
+RUN pip3 install scipy==1.10.1
 
-# Instalar scikit-learn
-RUN pip3 install -U scikit-learn
+# Instalar HDF5 y sus dependencias
+RUN apt-get update && apt-get install -y \
+    libhdf5-dev \
+    python3-dev \
+    python3-h5py
 
-# Instalar TensorFlow, puede especificar la versión o dejar la más reciente
+# Reinstalar h5py para asegurar compatibilidad con HDF5
+RUN pip3 install --force-reinstall h5py
+
+# Instalar TensorFlow
 RUN pip3 install tensorflow
 
 # Configurar el directorio de trabajo en /app
