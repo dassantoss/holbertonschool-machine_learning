@@ -46,8 +46,8 @@ class WGAN_clip(keras.Model):
             optimizer=self.generator.optimizer, loss=self.generator.loss)
 
         # Define discriminator loss and optimizer
-        self.discriminator.loss = lambda x, y: (
-            tf.reduce_mean(y) - tf.reduce_mean(x))
+        self.discriminator.loss = lambda real, fake: (
+            tf.reduce_mean(real) - tf.reduce_mean(fake))
         self.discriminator.optimizer = keras.optimizers.Adam(
             learning_rate=self.learning_rate,
             beta_1=self.beta_1,
@@ -89,7 +89,7 @@ class WGAN_clip(keras.Model):
                 fake_samples = self.get_fake_sample(training=True)
                 real_preds = self.discriminator(real_samples)
                 fake_preds = self.discriminator(fake_samples)
-                discr_loss = self.discriminator.loss(fake_preds, real_preds)
+                discr_loss = self.discriminator.loss(real_preds, fake_preds)
 
             # Apply gradients and clip weights
             discr_gradients = disc_tape.gradient(
