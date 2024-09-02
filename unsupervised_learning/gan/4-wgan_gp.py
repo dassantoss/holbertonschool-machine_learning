@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Wasserstein GAN with gradient penalty and weight replacement
+Wasserstein GAN with gradient penalty and weight replacement.
 """
 import tensorflow as tf
 from tensorflow import keras
@@ -14,8 +14,23 @@ class WGAN_GP(keras.Model):
                  real_examples, batch_size=200, disc_iter=2,
                  learning_rate=.005, lambda_gp=10):
         """
-        Initializes the WGAN-GP model with a generator, discriminator, latent
-        generator, real examples, and other parameters.
+        Initializes the WGAN-GP model with a generator, discriminator,
+        latent generator, real examples, and other parameters.
+
+        Parameters:
+        - generator (keras.Model): The generator model.
+        - discriminator (keras.Model): The discriminator model.
+        - latent_generator (function): Function that generates latent vectors.
+        - real_examples (tf.Tensor): Tensor containing real examples for
+        training.
+        - batch_size (int): The size of the batches to be used during training.
+        Default is 200.
+        - disc_iter (int): Number of iterations for the discriminator per
+        training step. Default is 2.
+        - learning_rate (float): Learning rate for the optimizers.
+        Default is 0.005.
+        - lambda_gp (float): The coefficient for the gradient penalty term.
+        Default is 10.
         """
         super().__init__()
         self.latent_generator = latent_generator
@@ -61,10 +76,9 @@ class WGAN_GP(keras.Model):
         stored in the provided .h5 files.
 
         Parameters:
-            gen_h5 (str): Path to the .h5 file containing the generator's
-            weights.
-            disc_h5 (str): Path to the .h5 file containing the discriminator's
-            weights.
+        - gen_h5 (str): Path to the .h5 file containing the generator's weights
+        - disc_h5 (str): Path to the .h5 file containing the discriminator's
+        weights.
         """
         self.generator.load_weights(gen_h5)
         self.discriminator.load_weights(disc_h5)
@@ -72,12 +86,39 @@ class WGAN_GP(keras.Model):
         print(f"Replaced discriminator weights from {disc_h5}")
 
     def get_fake_sample(self, size=None, training=False):
+        """
+        Generates a batch of fake samples using the generator.
+
+        Parameters:
+        - size (int, optional): Number of fake samples to generate. If not
+                                specified, the batch size specified during
+                                model initialization will be used. Default is
+                                None.
+        - training (bool, optional): Boolean indicating whether the generator
+                                     should produce samples in training mode
+                                     (with dropout, etc.) or inference mode.
+                                     Default is False.
+
+        Returns:
+        - tf.Tensor: A tensor containing the generated fake samples.
+        """
         if not size:
             size = self.batch_size
-        return self.generator(self.latent_generator(size),
-                              training=training)
+        return self.generator(self.latent_generator(size), training=training)
 
     def get_real_sample(self, size=None):
+        """
+        Retrieves a batch of real samples from the dataset.
+
+        Parameters:
+        - size (int, optional): Number of real samples to retrieve. If not
+                                specified, the batch size specified during
+                                model initialization will be used. Default is
+                                None.
+
+        Returns:
+        - tf.Tensor: A tensor containing the real samples.
+        """
         if not size:
             size = self.batch_size
         sorted_indices = tf.range(tf.shape(self.real_examples)[0])
@@ -85,11 +126,31 @@ class WGAN_GP(keras.Model):
         return tf.gather(self.real_examples, random_indices)
 
     def get_interpolated_sample(self, real_sample, fake_sample):
+        """
+        Generates interpolated samples between real and fake samples.
+
+        Parameters:
+        - real_sample (tf.Tensor): A tensor containing real samples.
+        - fake_sample (tf.Tensor): A tensor containing fake samples.
+
+        Returns:
+        - tf.Tensor: A tensor containing the interpolated samples.
+        """
         u = tf.random.uniform(self.scal_shape)
         v = tf.ones(self.scal_shape) - u
         return u * real_sample + v * fake_sample
 
     def gradient_penalty(self, interpolated_sample):
+        """
+        Computes the gradient penalty for the interpolated samples.
+
+        Parameters:
+        - interpolated_sample (tf.Tensor): A tensor containing interpolated
+        samples.
+
+        Returns:
+        - tf.Tensor: The gradient penalty.
+        """
         with tf.GradientTape() as gp_tape:
             gp_tape.watch(interpolated_sample)
             pred = self.discriminator(interpolated_sample, training=True)
@@ -98,6 +159,13 @@ class WGAN_GP(keras.Model):
         return tf.reduce_mean((norm - 1.0) ** 2)
 
     def train_step(self, _):
+        """
+        Executes one training step for the WGAN-GP model.
+
+        Returns:
+        - dict: A dictionary containing the losses for the discriminator,
+                generator, and gradient penalty.
+        """
         for _ in range(self.disc_iter):
             with tf.GradientTape() as disc_tape:
                 real_samples = self.get_real_sample()
