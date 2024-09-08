@@ -1,82 +1,98 @@
 #!/usr/bin/env python3
 """
-Gated Recurrent Unit
+Long Short-Term Memory unit
 """
 
 import numpy as np
 
 
-class GRUCell:
+class LSTMCell:
     """
-    This class represents the Gated Recurrent Unit of a RNN
+    This class represents the Long Short-Term Memory unit of a RNN
     """
 
     def __init__(self, i, h, o):
         """
-        Initialize the GRU.
+        Initialize the LSTM unit.
 
         :Parameters:
         - i (int): Dimensionality of the data.
         - h (int): Dimensionality of the hidden state.
         - o (int): Dimensionality of the outputs.
+
+        :Public attributes (weights and biases):
+        - Wf and bf are for the forget gate
+        - Wu and bu are for the update gate
+        - Wc and bc are for the intermediate cell state
+        - Wo and bo are for the output gate
+        - Wy and by are for the outputs
         """
-        # Weights initialized with a random normal distribution
-        self.Wz = np.random.randn(i + h, h)
-        self.Wr = np.random.randn(i + h, h)
-        self.Wh = np.random.randn(i + h, h)
+        # Weigths initialized with a random normal distribution
+        self.Wf = np.random.randn(i + h, h)
+        self.Wu = np.random.randn(i + h, h)
+        self.Wc = np.random.randn(i + h, h)
+        self.Wo = np.random.randn(i + h, h)
         self.Wy = np.random.randn(h, o)
 
-        # Biases initialized with zeros
-        self.bz = np.zeros((1, h))
-        self.br = np.zeros((1, h))
-        self.bh = np.zeros((1, h))
+        # biases are initialized with zeros
+        self.bf = np.zeros((1, h))
+        self.bu = np.zeros((1, h))
+        self.bc = np.zeros((1, h))
+        self.bo = np.zeros((1, h))
         self.by = np.zeros((1, o))
 
-    def forward(self, h_prev, x_t):
+    def forward(self, h_prev, c_prev, x_t):
         """
         Perform forward propagation for one time step.
 
         :Parameters:
         - h_prev (numpy.ndarray): Previous hidden state of shape (m, h).
+        - c_prev (numpy.ndarray): Previous cell state of shape (m, h).
         - x_t (numpy.ndarray): Data input for the cell of shape (m, i).
 
         :Returns:
         - h_next (numpy.ndarray): Next hidden state.
-        - y (numpy.ndarray): Softmax-activated output of the cell.
+        - c_next (numpy.ndarray): Next cell state.
+        - y (numpy.ndarray): softmax-activated output of the cell.
         """
-        # Concatenate previous hidden state and current input
+        # Concatenate previous hidden state and cell data input
         concat_h_x = np.concatenate((h_prev, x_t), axis=1)
 
-        # Update gate output
-        z_t = self.sigmoid(np.dot(concat_h_x, self.Wz) + self.bz)
+        # Forget gate
+        f_t = self.sigmoid(np.dot(concat_h_x, self.Wf) + self.bf)
 
-        # Reset gate output
-        r_t = self.sigmoid(np.dot(concat_h_x, self.Wr) + self.br)
+        # Update gate
+        u_t = self.sigmoid(np.dot(concat_h_x, self.Wu) + self.bu)
 
-        # Candidate hidden state h^_t (using reset gate)
-        concat_r_h_x = np.concatenate((r_t * h_prev, x_t), axis=1)
-        h_candidate = np.tanh(np.dot(concat_r_h_x, self.Wh) + self.bh)
+        # Output gate
+        o_t = self.sigmoid(np.dot(concat_h_x, self.Wo) + self.bo)
 
-        # Next hidden state h_next
-        h_next = (1 - z_t) * h_prev + z_t * h_candidate
+        # New cell input activation vector
+        c_act = np.tanh(np.dot(concat_h_x, self.Wc) + self.bc)
+
+        # New cell state
+        c_next = f_t * c_prev + u_t * c_act
+
+        # hidden state
+        h_next = o_t * np.tanh(c_next)
 
         # Calculate output using softmax activation function
         y_linear = np.dot(h_next, self.Wy) + self.by
         y = self.softmax(y_linear)
 
-        # Return both the hidden state and the softmax-activated output
-        return h_next, y
+        # Return next hidden state, cell state and softmax-activated output
+        return h_next, c_next, y
 
     @staticmethod
     def softmax(x):
         """
-        Softmax activation function
+        Simple softmax method
         """
         return np.exp(x) / np.exp(x).sum(axis=1, keepdims=True)
 
     @staticmethod
     def sigmoid(x):
         """
-        Sigmoid activation function
+        Simple sigmoid method
         """
         return 1 / (1 + np.exp(-x))
