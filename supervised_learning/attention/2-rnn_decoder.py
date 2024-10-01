@@ -17,23 +17,14 @@ class RNNDecoder(tf.keras.layers.Layer):
             batch (int): Batch size.
         """
         super(RNNDecoder, self).__init__()
-
-        # Embedding layer to convert word indices to embedding vectors
-        self.embedding = tf.keras.layers.Embedding(vocab, embedding)
-
-        # GRU layer for processing the decoder hidden states
-        self.gru = tf.keras.layers.GRU(
-            units,
-            recurrent_initializer='glorot_uniform',
-            return_sequences=False,
-            return_state=True
-        )
-
-        # Attention mechanism
-        self.attention = SelfAttention(units)
-
-        # Dense layer to project the output of the GRU to the vocabulary
+        self.embedding = tf.keras.layers.Embedding(input_dim=vocab,
+                                                   output_dim=embedding)
+        self.gru = tf.keras.layers.GRU(units=units,
+                                       return_sequences=True,
+                                       return_state=True,
+                                       recurrent_initializer='glorot_uniform')
         self.F = tf.keras.layers.Dense(vocab)
+        self.attention = SelfAttention(units)
 
     def call(self, x, s_prev, hidden_states):
         """Perform a forward pass through the decoder.
@@ -53,22 +44,19 @@ class RNNDecoder(tf.keras.layers.Layer):
         # Calculate the context vector using attention
         context, _ = self.attention(s_prev, hidden_states)
 
-        # Convert the previous word (x) into an embedding
+        # Pass the previous word index through the embedding layer
         x = self.embedding(x)
 
-        # Remove the extra dimension -> (batch, embedding)
-        x = tf.squeeze(x, axis=1)
+        # Concatenate the context vector with x (expand context dimension)
+        x = tf.concat([tf.expand_dims(context, 1), x], axis=-1)
 
-        # Concatenate the context vector with the embedding previous word
-        x_context = tf.concat([context, x], axis=-1)
+        # Pass the concatenated vector through the GRU layer
+        output, s = self.gru(x)
 
-        # Pass the concatenated vector to the GRU
-        output, s = self.gru(
-            tf.expand_dims(x_context, axis=1),
-            initial_state=s_prev
-        )
+        # Remove the extra axis
+        output = tf.squeeze(output, axis=1)
 
-        # Project the output of the GRU to the vocabulary space
+        # Pass the GRU output through the Dense layer to predict the next word
         y = self.F(output)
 
         return y, s
