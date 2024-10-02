@@ -53,4 +53,3 @@ class Encoder(tf.keras.layers.Layer):
             x = block(x, training, mask)
 
         return x
-    
