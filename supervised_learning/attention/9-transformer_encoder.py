@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Transformer Encoder for machine translation."""
 import tensorflow as tf
-import numpy as np
 positional_encoding = __import__('4-positional_encoding').positional_encoding
 EncoderBlock = __import__('7-transformer_encoder_block').EncoderBlock
 
@@ -27,8 +26,6 @@ class Encoder(tf.keras.layers.Layer):
         self.N = N
         self.embedding = tf.keras.layers.Embedding(input_vocab, dm)
         self.positional_encoding = positional_encoding(max_seq_len, dm)
-
-        # List of encoder blocks
         self.blocks = \
             [EncoderBlock(dm, h, hidden, drop_rate) for _ in range(N)]
         self.dropout = tf.keras.layers.Dropout(drop_rate)
@@ -46,17 +43,14 @@ class Encoder(tf.keras.layers.Layer):
             Tensor: Tensor of shape (batch, input_seq_len, dm), encoder output.
         """
         seq_len = tf.shape(x)[1]
-
-        # Add embedding and positional encoding
         x = self.embedding(x)  # (batch, input_seq_len, dm)
         x *= tf.math.sqrt(tf.cast(self.dm, tf.float32))
         x += self.positional_encoding[:seq_len, :]
 
-        # Apply dropout
         x = self.dropout(x, training=training)
 
-        # Pass through each encoder block
         for block in self.blocks:
             x = block(x, training, mask)
 
         return x
+    
