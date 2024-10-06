@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Module that creates and prepares a dataset for machine translation
+Pipeline for machine translation dataset preparation
 """
 
 import tensorflow_datasets as tfds
-import tensorflow as tf
 import transformers
+import tensorflow as tf
 
 
 class Dataset:
@@ -16,41 +16,92 @@ class Dataset:
 
     def __init__(self, batch_size, max_len):
         """
-        Initializes the Dataset object, loads and tokenizes the training
-        and validation datasets, and sets up the data pipeline.
+        Initializes the Dataset object and sets up the data pipeline.
 
         Args:
             batch_size: the batch size for training/validation.
             max_len: the maximum number of tokens allowed per example sentence.
         """
-        self.batch_size = batch_size
-        self.max_len = max_len
-
         # Load the Portuguese to English translation dataset
         self.data_train = tfds.load('ted_hrlr_translate/pt_to_en',
                                     split='train', as_supervised=True)
         self.data_valid = tfds.load('ted_hrlr_translate/pt_to_en',
                                     split='validation', as_supervised=True)
 
-        # Initialize tokenizers using sentences from the dataset
+        # Initialize tokenizers using the training data
         self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset(
             self.data_train)
 
-        # Prepare and process the training and validation datasets
-        self.data_train = self.prepare_pipeline(self.data_train, True)
-        self.data_valid = self.prepare_pipeline(self.data_valid, False)
+        # Tokenize the dataset using eager execution
+        self.data_train = \
+            self.data_train.map(self.tf_encode,
+                                num_parallel_calls=tf.data.AUTOTUNE)
+        self.data_valid = \
+            self.data_valid.map(self.tf_encode,
+                                num_parallel_calls=tf.data.AUTOTUNE)
+
+        # Store max_len and batch_size
+        self.max_len = max_len
+        self.batch_size = batch_size
+
+        # Prepare the data pipeline for training and validation datasets
+        self.data_train = self.prepare_pipeline(self.data_train,
+                                                is_training=True)
+        self.data_valid = self.prepare_pipeline(self.data_valid,
+                                                is_training=False)
+
+    def filter_max_len(self, sentence_1, sentence_2):
+        """
+        Filters out examples where either sentence exceeds max_len.
+
+        Args:
+            sentence_1: Portuguese sentence.
+            sentence_2: English sentence.
+
+        Returns:
+            A boolean tensor indicating if both sentences are within max_len.
+        """
+        return tf.logical_and(tf.size(sentence_1) <= self.max_len,
+                              tf.size(sentence_2) <= self.max_len)
+
+    def prepare_pipeline(self, data, is_training):
+        """
+        Prepares the data pipeline by filtering, tokenizing, batching, and
+        prefetching the dataset.
+
+        Args:
+            data: The dataset to process.
+            is_training: Whether the dataset is for training or validation.
+
+        Returns:
+            The processed dataset.
+        """
+        # Filter out sentences longer than max_len
+        data = data.filter(self.filter_max_len)
+
+        if is_training:
+            # Cache, shuffle, batch, and prefetch the training dataset
+            data = data.cache()
+            data = data.shuffle(buffer_size=20000)
+
+        # Group into padded batches
+        data = data.padded_batch(self.batch_size,
+                                 padded_shapes=([None], [None]))
+
+        # Prefetch the dataset
+        data = data.prefetch(tf.data.AUTOTUNE)
+
+        return data
 
     def tokenize_dataset(self, data):
         """
-        Tokenizes the dataset using pre-trained tokenizers and adapts them to
-        the dataset.
+        Tokenizes the dataset using pre-trained tokenizers.
 
         Args:
             data: tf.data.Dataset containing tuples of (pt, en) sentences.
 
         Returns:
-        - tokenizer_pt: Trained tokenizer for Portuguese.
-        - tokenizer_en: Trained tokenizer for English.
+            tokenizer_pt, tokenizer_en: Tokenizers for Portuguese and English.
         """
         pt_sentences = []
         en_sentences = []
@@ -66,7 +117,7 @@ class Dataset:
             'bert-base-uncased', use_fast=True,
             clean_up_tokenization_spaces=True)
 
-        # Train both tokenizers on the dataset sentence iterators
+        # Train both tokenizers on the dataset sentences
         tokenizer_pt = tokenizer_pt.train_new_from_iterator(pt_sentences,
                                                             vocab_size=2**13)
         tokenizer_en = tokenizer_en.train_new_from_iterator(en_sentences,
@@ -80,24 +131,27 @@ class Dataset:
         tokens.
 
         Args:
-            pt: `tf.Tensor` containing the Portuguese sentence.
-            en: `tf.Tensor` containing the corresponding English sentence.
+            pt: Portuguese sentence.
+            en: English sentence.
 
         Returns:
-        - pt_tokens: `np.ndarray` containing the Portuguese tokens.
-        - en_tokens: `np.ndarray` containing the English tokens.
+            pt_tokens, en_tokens: Encoded sentences as arrays of tokens.
         """
+        # Decode tensors to strings
         pt_sentence = pt.numpy().decode('utf-8')
         en_sentence = en.numpy().decode('utf-8')
 
+        # Get the vocabulary sizes from the tokenizers
         vocab_size_pt = self.tokenizer_pt.vocab_size
         vocab_size_en = self.tokenizer_en.vocab_size
 
+        # Tokenize sentences without special tokens
         pt_tokens = self.tokenizer_pt.encode(pt_sentence,
                                              add_special_tokens=False)
         en_tokens = self.tokenizer_en.encode(en_sentence,
                                              add_special_tokens=False)
 
+        # Add start and end tokens
         pt_tokens = [vocab_size_pt] + pt_tokens + [vocab_size_pt + 1]
         en_tokens = [vocab_size_en] + en_tokens + [vocab_size_en + 1]
 
@@ -105,16 +159,15 @@ class Dataset:
 
     def tf_encode(self, pt, en):
         """
-        TensorFlow wrapper for the encode method. Ensures the returned tensors
-        have the proper shape.
+        TensorFlow wrapper for the encode method to ensure compatibility with
+        TensorFlow's eager execution.
 
         Args:
-            pt: `tf.Tensor` containing the Portuguese sentence.
-            en: `tf.Tensor` containing the corresponding English sentence.
+            pt: Portuguese sentence.
+            en: English sentence.
 
         Returns:
-        - pt_tokens: `tf.Tensor` containing the Portuguese tokens.
-        - en_tokens: `tf.Tensor` containing the English tokens.
+            pt_tokens, en_tokens: Encoded sentences as tensors.
         """
         pt_tokens, en_tokens = tf.py_function(func=self.encode,
                                               inp=[pt, en],
@@ -125,43 +178,3 @@ class Dataset:
         en_tokens.set_shape([None])
 
         return pt_tokens, en_tokens
-
-    def filter_max_length(self, pt, en):
-        """
-        Filters out examples where either sentence is longer than max_len
-        tokens.
-        """
-        return tf.logical_and(tf.size(pt) <= self.max_len,
-                              tf.size(en) <= self.max_len)
-
-    def prepare_pipeline(self, data, is_training):
-        """
-        Prepares the data pipeline by filtering, tokenizing, batching, caching,
-        and prefetching the dataset.
-
-        Args:
-            data: the dataset to process.
-            is_training: whether the dataset is used for training or
-            validation.
-
-        Returns:
-        - The processed dataset ready for training or validation.
-        """
-        # Tokenize the sentences
-        data = data.map(self.tf_encode)
-
-        # Filter out examples longer than max_len
-        data = data.filter(self.filter_max_length)
-
-        if is_training:
-            # Cache, shuffle, batch, and prefetch the training dataset
-            data = data.cache()
-            data = data.shuffle(buffer_size=20000)
-
-        # Group into padded batches before prefetching
-        data = data.padded_batch(self.batch_size,
-                                 padded_shapes=([None], [None]))
-        # Prefetch after batching
-        data = data.prefetch(tf.data.experimental.AUTOTUNE)
-
-        return data
