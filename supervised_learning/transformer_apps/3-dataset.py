@@ -2,6 +2,7 @@
 """
 Module that creates and prepares a dataset for machine translation
 """
+
 import tensorflow_datasets as tfds
 import tensorflow as tf
 import transformers
@@ -157,9 +158,10 @@ class Dataset:
             data = data.cache()
             data = data.shuffle(buffer_size=20000)
 
-        # Group into padded batches and prefetch the data
+        # Group into padded batches before prefetching
         data = data.padded_batch(self.batch_size,
                                  padded_shapes=([None], [None]))
+        # Prefetch after batching
         data = data.prefetch(tf.data.experimental.AUTOTUNE)
 
         return data
