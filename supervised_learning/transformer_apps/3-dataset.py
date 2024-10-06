@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Pipeline for machine translation dataset preparation
+Pipeline
 """
 
 import tensorflow_datasets as tfds
@@ -16,11 +16,10 @@ class Dataset:
 
     def __init__(self, batch_size, max_len):
         """
-        Initializes the Dataset object and sets up the data pipeline.
-
-        Args:
-            batch_size: the batch size for training/validation.
-            max_len: the maximum number of tokens allowed per example sentence.
+        Initializes the Dataset object and loads the training and validation
+        datasets. Also initializes tokenizers for Portuguese and English.
+        Tokenizes the training and validation data by mapping the encode
+        method to it, using eager execution.
         """
         # Load the Portuguese to English translation dataset
         self.data_train = tfds.load('ted_hrlr_translate/pt_to_en',
@@ -28,31 +27,37 @@ class Dataset:
         self.data_valid = tfds.load('ted_hrlr_translate/pt_to_en',
                                     split='validation', as_supervised=True)
 
-        # Initialize tokenizers using the training data
+        # Initialize tokenizers
         self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset(
             self.data_train)
 
-        # Tokenize the dataset using eager execution
-        self.data_train = \
-            self.data_train.map(self.tf_encode,
-                                num_parallel_calls=tf.data.AUTOTUNE)
-        self.data_valid = \
-            self.data_valid.map(self.tf_encode,
-                                num_parallel_calls=tf.data.AUTOTUNE)
+        # Tokenize the dataset splits
+        self.data_train = self.data_train.map(
+            self.tf_encode, num_parallel_calls=tf.data.AUTOTUNE)
+        self.data_valid = self.data_valid.map(
+            self.tf_encode, num_parallel_calls=tf.data.AUTOTUNE)
 
-        # Store max_len and batch_size
+        # Set max_len attribute for convenience
         self.max_len = max_len
-        self.batch_size = batch_size
 
-        # Prepare the data pipeline for training and validation datasets
-        self.data_train = self.prepare_pipeline(self.data_train,
-                                                is_training=True)
-        self.data_valid = self.prepare_pipeline(self.data_valid,
-                                                is_training=False)
+        # Filter, cache, shuffle, split into padded batches & prefetch data
+        self.data_train = self.data_train.filter(self.filter_max_len)
+        self.data_train = self.data_train.cache()
+        self.data_train = self.data_train.shuffle(buffer_size=20000)
+        self.data_train = self.data_train.padded_batch(
+            batch_size=batch_size,
+            padded_shapes=([None], [None]))
+        self.data_train = self.data_train.prefetch(tf.data.AUTOTUNE)
+
+        # Only filter and split into padded batches for the validation data
+        self.data_valid = self.data_valid.filter(self.filter_max_len)
+        self.data_valid = self.data_valid.padded_batch(
+            batch_size=batch_size,
+            padded_shapes=([None], [None]))
 
     def filter_max_len(self, sentence_1, sentence_2):
         """
-        Filters out examples where either sentence exceeds max_len.
+        Filters out examples where either sentence is longer than max_len.
 
         Args:
             sentence_1: Portuguese sentence.
@@ -63,35 +68,6 @@ class Dataset:
         """
         return tf.logical_and(tf.size(sentence_1) <= self.max_len,
                               tf.size(sentence_2) <= self.max_len)
-
-    def prepare_pipeline(self, data, is_training):
-        """
-        Prepares the data pipeline by filtering, tokenizing, batching, and
-        prefetching the dataset.
-
-        Args:
-            data: The dataset to process.
-            is_training: Whether the dataset is for training or validation.
-
-        Returns:
-            The processed dataset.
-        """
-        # Filter out sentences longer than max_len
-        data = data.filter(self.filter_max_len)
-
-        if is_training:
-            # Cache, shuffle, batch, and prefetch the training dataset
-            data = data.cache()
-            data = data.shuffle(buffer_size=20000)
-
-        # Group into padded batches
-        data = data.padded_batch(self.batch_size,
-                                 padded_shapes=([None], [None]))
-
-        # Prefetch the dataset
-        data = data.prefetch(tf.data.AUTOTUNE)
-
-        return data
 
     def tokenize_dataset(self, data):
         """
