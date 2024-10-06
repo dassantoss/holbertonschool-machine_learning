@@ -67,6 +67,12 @@ RUN pip3 install keras==2.15.0
 # *** Instalar pandas ***
 RUN pip3 install pandas
 
+# *** Añadir instalación de Transformers versión 4.44.2 ***
+RUN pip3 install transformers==4.44.2
+
+# *** Añadir instalación de TensorFlow Datasets (TFDS) versión 4.9.2 ***
+RUN pip3 install tensorflow-datasets==4.9.2
+
 # Establecer variables de entorno para solucionar problemas de OpenMP y TLS block
 ENV OMP_NUM_THREADS=1
 ENV LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
