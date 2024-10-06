@@ -40,7 +40,7 @@ class Dataset:
             'neuralmind/bert-base-portuguese-cased',
             model_max_length=2**13,
             use_fast=True,
-            clean_up_tokenization_spaces=True
+            clean_up_tokenization_spaces=False  # Make sure not to clean spaces
         )
 
         # Pre-trained English tokenizer
@@ -48,7 +48,7 @@ class Dataset:
             'bert-base-uncased',
             model_max_length=2**13,
             use_fast=True,
-            clean_up_tokenization_spaces=True
+            clean_up_tokenization_spaces=False  # Make sure not to clean spaces
         )
 
         return tokenizer_pt, tokenizer_en
