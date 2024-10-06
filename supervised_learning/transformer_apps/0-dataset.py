@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Module that creates and prepares a dataset for machine translation"""
+"""
+Module that creates and prepares a dataset for machine translation
+"""
 import tensorflow_datasets as tfds
-from transformers import AutoTokenizer
+import transformers
 
 
 class Dataset:
@@ -22,7 +24,7 @@ class Dataset:
         self.data_valid = tfds.load('ted_hrlr_translate/pt_to_en',
                                     split='validation', as_supervised=True)
 
-        # Tokenizers initialized using pre-trained models
+        # Initialize tokenizers using pre-trained models
         self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset()
 
     def tokenize_dataset(self):
@@ -34,7 +36,7 @@ class Dataset:
         - tokenizer_en: Pre-trained tokenizer for English.
         """
         # Pre-trained Portuguese tokenizer
-        tokenizer_pt = AutoTokenizer.from_pretrained(
+        tokenizer_pt = transformers.AutoTokenizer.from_pretrained(
             'neuralmind/bert-base-portuguese-cased',
             model_max_length=2**13,
             use_fast=True,
@@ -42,7 +44,7 @@ class Dataset:
         )
 
         # Pre-trained English tokenizer
-        tokenizer_en = AutoTokenizer.from_pretrained(
+        tokenizer_en = transformers.AutoTokenizer.from_pretrained(
             'bert-base-uncased',
             model_max_length=2**13,
             use_fast=True,
