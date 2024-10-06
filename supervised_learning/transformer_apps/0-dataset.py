@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Module that creates and prepares a dataset for machine translation"""
-import tensorflow as tf
 import tensorflow_datasets as tfds
 from transformers import AutoTokenizer
 
@@ -29,7 +28,6 @@ class Dataset:
     def tokenize_dataset(self):
         """
         Loads pre-trained tokenizers for Portuguese and English.
-        No additional training is done since the tokenizers are pre-trained.
 
         Returns:
         - tokenizer_pt: Pre-trained tokenizer for Portuguese.
