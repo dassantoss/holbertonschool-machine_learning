@@ -96,11 +96,11 @@ def train_transformer(N, dm, h, hidden, max_len, batch_size, epochs):
 
             if batch % 50 == 0:
                 print(f'Epoch {epoch+1}, Batch {batch}: '
-                      f'Loss {train_loss.result()},
-                      Accuracy {train_accuracy.result()}')
+                      f'Loss {train_loss.result()}, '
+                      f'Accuracy {train_accuracy.result()}')
 
         print(f'Epoch {epoch+1}: '
-              f'Loss {train_loss.result()},
-              Accuracy {train_accuracy.result()}')
+              f'Loss {train_loss.result()}, '
+              f'Accuracy {train_accuracy.result()}')
 
     return transformer
