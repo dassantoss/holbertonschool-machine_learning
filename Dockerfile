@@ -34,44 +34,23 @@ RUN apt-get update && apt-get install -y \
 # Establecer la versión de Python deseada y asegurar que es la predeterminada
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
-# Instalar Numpy compatible con TensorFlow
-RUN pip3 install numpy==1.24.3
+# Instalar Numpy, Matplotlib, Pillow y otras dependencias
+RUN pip3 install numpy==1.24.3 matplotlib Pillow pycodestyle==2.11.1 pandas
 
-# Instalar Matplotlib y Pillow
-RUN pip3 install matplotlib Pillow
+# Instalar TensorFlow y Keras compatibles
+RUN pip3 install tensorflow==2.13.1 keras==2.13.1
 
-# Instalar pycodestyle
-RUN pip3 install pycodestyle==2.11.1
+# Instalar scikit-learn y scipy
+RUN pip3 install scikit-learn scipy==1.10.1
 
-# Instalar scikit-learn utilizando binarios precompilados
-RUN pip3 install scikit-learn
+# Actualizar h5py a la versión que resuelve el problema
+RUN pip3 install --upgrade h5py
 
-# Instalar scipy versión 1.10.1
-RUN pip3 install scipy==1.10.1
-
-# Reinstalar h5py para asegurar compatibilidad con HDF5
-RUN pip3 install --force-reinstall h5py
-
-# Instalar TensorFlow con mayor tiempo de espera
-RUN pip3 install --default-timeout=100 tensorflow
+# Instalar Tensorflow Hub, Transformers y TensorFlow Datasets con versiones compatibles
+RUN pip3 install tensorflow-hub==0.15.0 transformers==4.44.2 tensorflow-datasets==4.9.2
 
 # Instalar la versión específica de Gensim
 RUN pip3 install gensim==4.3.3
-
-# Verificar e instalar la versión específica de Keras
-RUN pip3 install keras==2.13.1
-
-# Instalar pandas
-RUN pip3 install pandas
-
-# Instalar Tensorflow Hub
-RUN pip3 install tensorflow-hub==0.15.0
-
-# Instalar Transformers versión 4.44.2
-RUN pip3 install transformers==4.44.2
-
-# Instalar TensorFlow Datasets (TFDS) versión 4.9.2
-RUN pip3 install tensorflow-datasets==4.9.2
 
 # Establecer variables de entorno para solucionar problemas de OpenMP y TLS block
 ENV OMP_NUM_THREADS=1
