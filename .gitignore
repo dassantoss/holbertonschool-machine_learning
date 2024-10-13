@@ -64,3 +64,4 @@ unsupervised_learning/gan/data/small_res_faces_10000.npy
 unsupervised_learning/gan/data/discriminator.h5
 unsupervised_learning/gan/data/generator.h5
 time_series/
+ZendeskArticles/
