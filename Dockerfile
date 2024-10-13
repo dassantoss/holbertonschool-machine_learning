@@ -26,6 +26,9 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     cython3 \
     gfortran \
+    libhdf5-dev \
+    python3-dev \
+    python3-h5py \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Establecer la versión de Python deseada y asegurar que es la predeterminada
@@ -46,12 +49,6 @@ RUN pip3 install scikit-learn
 # Instalar scipy versión 1.10.1
 RUN pip3 install scipy==1.10.1
 
-# Instalar HDF5 y sus dependencias
-RUN apt-get update && apt-get install -y \
-    libhdf5-dev \
-    python3-dev \
-    python3-h5py
-
 # Reinstalar h5py para asegurar compatibilidad con HDF5
 RUN pip3 install --force-reinstall h5py
 
@@ -62,15 +59,18 @@ RUN pip3 install --default-timeout=100 tensorflow
 RUN pip3 install gensim==4.3.3
 
 # Verificar e instalar la versión específica de Keras
-RUN pip3 install keras==2.15.0
+RUN pip3 install keras==2.13.1
 
-# *** Instalar pandas ***
+# Instalar pandas
 RUN pip3 install pandas
 
-# *** Añadir instalación de Transformers versión 4.44.2 ***
+# Instalar Tensorflow Hub
+RUN pip3 install tensorflow-hub==0.15.0
+
+# Instalar Transformers versión 4.44.2
 RUN pip3 install transformers==4.44.2
 
-# *** Añadir instalación de TensorFlow Datasets (TFDS) versión 4.9.2 ***
+# Instalar TensorFlow Datasets (TFDS) versión 4.9.2
 RUN pip3 install tensorflow-datasets==4.9.2
 
 # Establecer variables de entorno para solucionar problemas de OpenMP y TLS block
