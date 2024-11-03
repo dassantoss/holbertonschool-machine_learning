@@ -52,6 +52,11 @@ RUN pip3 install tensorflow-hub==0.15.0 transformers==4.44.2 tensorflow-datasets
 # Instalar la versión específica de Gensim
 RUN pip3 install gensim==4.3.3
 
+# Instalar Gymnasium 0.29.1 y dependencias específicas de Pillow y h5py
+RUN pip3 install --user gymnasium==0.29.1
+RUN pip3 install --user Pillow==10.3.0
+RUN pip3 install --user h5py==3.11.0
+
 # Establecer variables de entorno para solucionar problemas de OpenMP y TLS block
 ENV OMP_NUM_THREADS=1
 ENV LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
