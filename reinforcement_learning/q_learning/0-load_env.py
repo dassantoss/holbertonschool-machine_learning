@@ -55,5 +55,6 @@ def load_frozen_lake(desc=None, map_name=None, is_slippery=False):
     # Load a pre-defined 4x4 map with non-slippery ice
     env = load_frozen_lake(map_name="4x4", is_slippery=False)
     """
-    return gym.make('FrozenLake-v1', desc=desc, map_name=map_name,
-                    is_slippery=is_slippery)
+    return gym.make("FrozenLake-v1", desc=desc, map_name=map_name, 
+                    is_slippery=is_slippery, render_mode="ansi")
+
