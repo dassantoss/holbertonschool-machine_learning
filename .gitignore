@@ -65,3 +65,5 @@ unsupervised_learning/gan/data/discriminator.h5
 unsupervised_learning/gan/data/generator.h5
 time_series/
 ZendeskArticles/
+dqn_env/
+reinforcement_learning/deep_q_learning/policy.h5
