@@ -34,28 +34,27 @@ RUN apt-get update && apt-get install -y \
 # Establecer la versión de Python deseada y asegurar que es la predeterminada
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
-# Instalar Numpy, Matplotlib, Pillow y otras dependencias
-RUN pip3 install numpy==1.24.3 matplotlib Pillow pycodestyle==2.11.1 pandas
+# Instalar las versiones especificadas de Numpy, TensorFlow, Keras y demás dependencias
+RUN pip3 install numpy==1.24.3 matplotlib Pillow==10.3.0 pycodestyle==2.11.1 pandas
 
-# Instalar TensorFlow y Keras compatibles
-RUN pip3 install tensorflow==2.13.1 keras==2.13.1
+# Instalar versiones anteriores de TensorFlow y Keras compatibles con keras-rl2
+RUN pip3 install tensorflow==2.10.0 keras==2.10.0
 
 # Instalar scikit-learn y scipy
 RUN pip3 install scikit-learn scipy==1.10.1
 
-# Actualizar h5py a la versión que resuelve el problema
-RUN pip3 install --upgrade h5py
+# Actualizar h5py a la versión especificada
+RUN pip3 install h5py==3.11.0
 
-# Instalar Tensorflow Hub, Transformers y TensorFlow Datasets con versiones compatibles
+# Instalar Tensorflow Hub, Transformers y TensorFlow Datasets
 RUN pip3 install tensorflow-hub==0.15.0 transformers==4.44.2 tensorflow-datasets==4.9.2
 
 # Instalar la versión específica de Gensim
 RUN pip3 install gensim==4.3.3
 
-# Instalar Gymnasium 0.29.1 y dependencias específicas de Pillow y h5py
-RUN pip3 install --user gymnasium==0.29.1
-RUN pip3 install --user Pillow==10.3.0
-RUN pip3 install --user h5py==3.11.0
+# Instalar Gymnasium y otras dependencias, excluyendo `atari` para evitar conflictos
+RUN pip3 install gymnasium==0.29.1 gymnasium[other] \
+    keras-rl2==1.0.4 autorom[accept-rom-license]
 
 # Establecer variables de entorno para solucionar problemas de OpenMP y TLS block
 ENV OMP_NUM_THREADS=1
