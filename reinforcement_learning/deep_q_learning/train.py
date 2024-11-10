@@ -55,6 +55,9 @@ class CompatibilityWrapper(gym.Wrapper):
         """Resets environment and returns initial observation."""
         observation, info = self.env.reset(**kwargs)
         return observation
+    
+    def render(self, *args, **kwargs):
+        return self.env.render()  # Direct call to render without arguments
 
 
 def build_model(input_shape, nb_actions):
@@ -117,13 +120,15 @@ def main():
     Main function to create environment, build model, and start training.
     Saves trained weights after completion.
     """
-    env = gym.make("ALE/Breakout-v5")
+    # env = gym.make("ALE/Breakout-v5")
+    env = gym.make("ALE/Breakout-v5", render_mode="human")
+
     env = CompatibilityWrapper(env)
     nb_actions = env.action_space.n
     model = build_model((4, 84, 84), nb_actions)
     dqn = build_agent(model, nb_actions)
 
-    dqn.fit(env, nb_steps=200000, visualize=False, verbose=2)
+    dqn.fit(env, nb_steps=1000000, visualize=True, verbose=2)
     dqn.save_weights('policy.h5', overwrite=True)
 
 
