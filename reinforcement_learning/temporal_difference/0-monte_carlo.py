@@ -22,26 +22,29 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1,
     """
     for episode in range(episodes):
         # Generate an episode
-        state = env.reset()[0]
-        episode_data = []
+        state = env.reset()[0]  # Reset environment and get initial state
+        episode_data = []  # Store state-reward pairs for this episode
 
         for step in range(max_steps):
-            action = policy(state)
-            next_state, reward, done, _, _ = env.step(action)
-            episode_data.append((state, reward))
-            state = next_state
+            action = policy(state)  # Get action from policy
+            next_state, reward, done, _, _ = env.step(action)  # Take action
+            episode_data.append((state, reward))  # Save state and reward
+            state = next_state  # Move to next state
             if done:
-                break
+                break  # End episode if we reach a terminal state
 
-        # Calculate the return for each state in the episode
-        G = 0  # Return
+        # Calculate the return G for each state in the episode
+        G = 0  # Initialize the return
         visited_states = set()
 
+        # Traverse episode_data in reverse order for G calculation
         for state, reward in reversed(episode_data):
-            G = reward + gamma * G  # Accumulated return
+            G = reward + gamma * G
+
+            # Update V only if the state has not been visited in this episode
             if state not in visited_states:
                 visited_states.add(state)
-                # Update the value estimate V for state
+                # Incremental update of the state value
                 V[state] = V[state] + alpha * (G - V[state])
 
     return V
