@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Simplified Training Loop for Monte-Carlo Policy Gradient
+Training Loop for Monte-Carlo Policy Gradient with Rendering
 """
 import numpy as np
 policy_gradient = __import__('policy_gradient').policy_gradient
 
 
-def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
+def train(env, nb_episodes, alpha=0.000045, gamma=0.98, show_result=False):
     """
     Train the policy using Monte-Carlo policy gradient.
 
@@ -15,6 +15,7 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
         nb_episodes: number of episodes used for training
         alpha: the learning rate
         gamma: the discount factor
+        show_result: if True, renders the environment every 1000 episodes
 
     Returns:
         list: Score values (rewards obtained during each episode)
@@ -36,6 +37,10 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
         while not done:
             # Get action and gradient
             action, gradient = policy_gradient(state, weights)
+
+            # Render the environment every 1000 episodes show_result is True
+            if show_result and episode % 1000 == 0:
+                env.render()
 
             # Take action in the environment
             next_state, reward, terminated, truncated, _ = env.step(action)
