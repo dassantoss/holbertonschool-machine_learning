@@ -1,4 +1,4 @@
-# Pipelines
+# Pipeline
 
 ## Overview
 
