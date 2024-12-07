@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Module to convert DataFrame columns to a numpy array."""
-import pandas as pd
 
 
 def array(df):
