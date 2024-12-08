@@ -44,6 +44,7 @@ if __name__ == '__main__':
         launchpad_name = launchpad_data.get('name', 'Unknown Launchpad')
         launchpad_locality = launchpad_data.get('locality', 'Unknown Locality')
 
-    # Format and display the details
-    print(f"{launch_name} ({date_local}) {rocket_name} - \
-        {launchpad_name} ({launchpad_locality})")
+    # Format and print launch details
+    output = f"{launch_name} ({date_local}) {rocket_name} - "
+    output += f"{launchpad_name} ({launchpad_locality})"
+    print(output)
