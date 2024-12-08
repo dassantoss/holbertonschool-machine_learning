@@ -14,15 +14,16 @@ if __name__ == '__main__':
 
     launches = response.json()
 
-    # Ordenar los lanzamientos por la fecha del lanzamiento (date_unix)
-    launches.sort(key=lambda x: x.get('date_unix', float('inf')))
+    # Filtrar lanzamientos con fecha válida y ordenar por date_unix
+    valid_launches = [launch for launch in launches if launch.get('date_unix')]
+    valid_launches.sort(key=lambda x: x['date_unix'])
 
     # Seleccionar el primer lanzamiento
-    first_launch = launches[0]
+    first_launch = valid_launches[0]
 
     # Obtener detalles del primer lanzamiento
     launch_name = first_launch.get('name', 'Unknown')
-    date_unix = first_launch.get('date_unix', 0)
+    date_unix = first_launch['date_unix']
     date_local = datetime.fromtimestamp(date_unix).astimezone().isoformat()
     rocket_id = first_launch.get('rocket', '')
     launchpad_id = first_launch.get('launchpad', '')
