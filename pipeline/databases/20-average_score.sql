@@ -1,3 +1,4 @@
+-- Creates a stored procedure to compute average score for a user
 DELIMITER $$
 
 DROP PROCEDURE IF EXISTS ComputeAverageScoreForUser $$
