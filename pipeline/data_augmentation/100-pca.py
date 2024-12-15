@@ -3,7 +3,6 @@
 Module for PCA Color Augmentation as described in the AlexNet paper.
 """
 import tensorflow as tf
-import numpy as np
 
 
 def pca_color(image, alphas):
@@ -13,29 +12,38 @@ def pca_color(image, alphas):
     Args:
         image (tf.Tensor): A 3D tensor containing the image to augment.
         alphas (tuple): A tuple of length 3 containing the amount each
-                        channel should change.
+                   channel should change.
 
     Returns:
         tf.Tensor: The augmented image.
     """
-    # Convert image to numpy array and normalize to [0, 1]
-    image_np = tf.cast(image, tf.float32).numpy() / 255.0
+    # Normalize the image to [0, 1]
+    image = tf.cast(image, tf.float32) / 255.0
 
-    # Reshape to a 2D array (pixel_count, channels)
-    flat_image = image_np.reshape(-1, 3)
+    # Reshape the image to (pixel_count, 3)
+    flat_image = tf.reshape(image, (-1, 3))
+
+    # Compute the mean and center the image
+    mean = tf.reduce_mean(flat_image, axis=0, keepdims=True)
+    centered_image = flat_image - mean
 
     # Compute the covariance matrix
-    covariance_matrix = np.cov(flat_image, rowvar=False)
+    covariance_matrix = \
+        tf.matmul(tf.transpose(centered_image),
+                  centered_image) / tf.cast(tf.shape(flat_image)[0],
+                                            tf.float32)
 
     # Compute eigenvalues and eigenvectors
-    eigenvalues, eigenvectors = np.linalg.eigh(covariance_matrix)
+    eigenvalues, eigenvectors = tf.linalg.eigh(covariance_matrix)
 
     # Adjust colors using eigenvalues and alphas
-    delta = eigenvectors @ (eigenvalues * alphas)
+    delta = tf.matmul(eigenvectors, tf.reshape(eigenvalues * alphas, [-1, 1]))
+    delta = tf.broadcast_to(tf.transpose(delta), tf.shape(flat_image))
     augmented_image = flat_image + delta
 
     # Clip values to [0, 1] and reshape back to original shape
-    augmented_image = np.clip(augmented_image, 0, 1).reshape(image_np.shape)
+    augmented_image = tf.clip_by_value(augmented_image, 0, 1)
+    augmented_image = tf.reshape(augmented_image, tf.shape(image))
 
     # Convert back to tensor and scale to [0, 255]
-    return tf.convert_to_tensor(augmented_image * 255, dtype=tf.uint8)
+    return tf.cast(augmented_image * 255, tf.uint8)
