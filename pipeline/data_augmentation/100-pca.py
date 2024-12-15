@@ -38,8 +38,9 @@ def pca_color(image, alphas):
 
     # Adjust colors using eigenvalues and alphas
     delta = tf.matmul(eigenvectors, tf.reshape(eigenvalues * alphas, [-1, 1]))
-    delta = tf.broadcast_to(tf.transpose(delta), tf.shape(flat_image))
-    augmented_image = flat_image + delta
+    delta = tf.transpose(delta)
+    delta = tf.broadcast_to(delta, tf.shape(centered_image))
+    augmented_image = centered_image + delta + mean
 
     # Clip values to [0, 1] and reshape back to original shape
     augmented_image = tf.clip_by_value(augmented_image, 0, 1)
